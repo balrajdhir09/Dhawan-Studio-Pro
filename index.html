@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dhawan Studio Pro</title>
+  <meta name="theme-color" content="#070707">
+  
+  <!-- Embedded PWA Manifest for Direct Phone Installation -->
+  <link rel="manifest" id="dynamicManifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Dhawan%20Studio%20Pro%22%2C%22short_name%22%3A%22DhawanStudio%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23070707%22%2C%22theme_color%22%3A%22%23070707%22%2C%22icons%22%3A%5B%5D%7D">
+
+  <style>
+    :root {
+      --bg: #070707;
+      --card: #111111;
+      --card-border: #220808;
+      --blood-dark: #440000;
+      --blood-red: #8b0000;
+      --blood-bright: #dc2626;
+      --text: #f4f4f5;
+      --text-dim: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(13, 4, 4, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid var(--blood-red);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .brand-wrap { display: flex; flex-direction: column; gap: 1px; }
+    .brand { font-weight: 900; font-size: 16px; letter-spacing: 0.8px; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .brand span { color: var(--blood-bright); }
+
+    .sub-brand-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #ff4d4d;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(220, 38, 38, 0.45);
+      user-select: none;
+      margin-top: 1px;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    
+    .vault-pill-btn {
+      background: #180505;
+      border: 1px solid var(--blood-bright);
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .vault-pill-btn:hover { background: var(--blood-red); }
+    .vault-count {
+      background: var(--blood-bright);
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px 12px 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--blood-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+    @media(max-width: 480px) {
+      .input-grid { grid-template-columns: 1fr; }
+    }
+    
+    label { font-size: 12px; color: var(--text-dim); display: flex; flex-direction: column; gap: 4px; font-weight: 600; width: 100%; }
+    
+    input[type="text"], input[type="number"], input[type="password"], select, textarea {
+      width: 100%;
+      background: #080808;
+      border: 1px solid #331111;
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus, select:focus, textarea:focus {
+      border-color: var(--blood-bright);
+      box-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+    }
+    textarea { 
+      min-height: 200px; 
+      font-family: ui-monospace, monospace; 
+      line-height: 1.45; 
+      font-size: 12.5px; 
+      tab-size: 2; 
+      resize: vertical; 
+    }
+    textarea::placeholder, input::placeholder {
+      color: #555;
+      font-style: italic;
+    }
+
+    /* Double-Tap Lock Styling */
+    .locked-input {
+      cursor: not-allowed;
+      border-style: dashed !important;
+      color: #aaa !important;
+      background: #060202 !important;
+      user-select: none;
+    }
+    .locked-input:not([readonly]) {
+      cursor: text !important;
+      border-style: solid !important;
+      color: #fff !important;
+      background: #080808 !important;
+      border-color: var(--blood-bright) !important;
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.45);
+      user-select: auto;
+    }
+
+    /* Optimized Icon Slot */
+    .icon-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #090404;
+      padding: 10px;
+      border: 1px dashed var(--blood-dark);
+      border-radius: 6px;
+    }
+    .icon-preview {
+      width: 46px;
+      height: 46px;
+      background: #000;
+      border: 1px solid var(--blood-red);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .icon-preview img, .icon-preview svg { width: 100%; height: 100%; object-fit: cover; }
+
+    /* 3 Popup Triggers Grid */
+    .popup-trigger-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+    @media(max-width: 580px) {
+      .popup-trigger-row { grid-template-columns: 1fr; }
+    }
+
+    .modal-trigger-btn {
+      background: #140505;
+      border: 1px solid var(--blood-red);
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      color: #eee;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .modal-trigger-btn:hover {
+      background: #240808;
+      border-color: var(--blood-bright);
+    }
+    .trigger-badge {
+      background: var(--blood-bright);
+      color: #fff;
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    /* Action Buttons Row */
+    .btn-row { 
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr); 
+      gap: 8px; 
+      width: 100%;
+    }
+    @media(max-width: 520px) { 
+      .btn-row { grid-template-columns: 1fr 1fr; } 
+    }
+
+    button.action-btn {
+      padding: 11px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: 0.2s;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .btn-run { background: #1c0505; color: #ff7777; border-color: var(--blood-red); }
+    .btn-run:hover { background: var(--blood-red); color: #fff; }
+    .btn-build { background: var(--blood-bright); color: #fff; box-shadow: 0 0 10px rgba(220, 38, 38, 0.4); }
+    .btn-build:hover { background: #b91c1c; }
+    .btn-sub { background: #0c0404; color: #bbb; border-color: #2e0d0d; }
+    .btn-sub:hover { background: #1c0707; color: #fff; border-color: var(--blood-red); }
+
+    /* Live Preview Panel */
+    .preview-panel {
+      background: #0c0505;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px 14px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .preview-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-actions { display: flex; gap: 6px; }
+    .mini-ctrl-btn {
+      background: #180808;
+      border: 1px solid #3d0e0e;
+      color: #bbb;
+      padding: 5px 10px;
+      font-size: 11px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .mini-ctrl-btn:hover { background: #260a0a; color: #fff; }
+
+    /* Real-Life Phone Shell (19.5:9 Aspect Ratio) */
+    .phone {
+      width: 100%;
+      max-width: 325px;
+      height: 660px;
+      background: #000;
+      border: 6px solid #1c0808;
+      outline: 1px solid #3a0d0d;
+      border-radius: 38px;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.95), 0 0 24px rgba(139, 0, 0, 0.28);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    .phone.landscape {
+      max-width: 660px;
+      height: 325px;
+      border-radius: 26px;
+    }
+    
+    /* Modern Punch-Hole Camera Bar */
+    .notch-bar {
+      height: 22px;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+    .camera {
+      width: 9px;
+      height: 9px;
+      background: #040202;
+      border: 1.5px solid #280808;
+      border-radius: 50%;
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.9);
+    }
+
+    iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #ffffff;
+    }
+
+    /* Sleek Gesture Navigation Bar */
+    .nav-bar-pill {
+      height: 16px;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .gesture-indicator {
+      width: 100px;
+      height: 3.5px;
+      background: #444;
+      border-radius: 4px;
+    }
+
+    /* Single Line Footer */
+    footer.app-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 8px 24px;
+      font-size: clamp(9px, 2.8vw, 11px);
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #ff4d4d;
+      text-transform: uppercase;
+      user-select: none;
+      white-space: nowrap;
+      width: 100%;
+      text-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+    }
+    footer.app-footer::before,
+    footer.app-footer::after {
+      content: "";
+      height: 1px;
+      flex: 0 1 30px;
+      min-width: 8px;
+      background: linear-gradient(90deg, transparent, #8b0000, transparent);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+    .modal-backdrop.active { display: flex; }
+
+    .modal-box {
+      background: #0e0707;
+      border: 1px solid #4a1010;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 530px;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.95);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #200606;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #140404;
+    }
+    .modal-title { font-size: 13px; font-weight: bold; color: #fff; letter-spacing: 0.5px; }
+    .close-icon { background: none; border: none; color: #999; font-size: 20px; cursor: pointer; }
+
+    .modal-body { padding: 14px; overflow-y: auto; max-height: 380px; display: flex; flex-direction: column; gap: 12px; }
+
+    .cfg-sub-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--blood-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px dashed #280909;
+      padding-bottom: 4px;
+      margin-top: 2px;
+    }
+    .cfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media(max-width: 440px) { .cfg-grid { grid-template-columns: 1fr; } }
+    
+    .cfg-item { display: flex; flex-direction: column; gap: 4px; }
+    .cfg-item span { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+    .cfg-item input, .cfg-item select, .cfg-item textarea { padding: 8px 10px; font-size: 12.5px; }
+
+    .gen-card {
+      background: #080303;
+      border: 1px solid #280b0b;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Permissions Inside Modal */
+    .category-bar {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #090909;
+      border-bottom: 1px solid #1a0808;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .category-bar::-webkit-scrollbar { display: none; }
+    
+    .cat-pill {
+      background: #140808;
+      border: 1px solid #2e0c0c;
+      color: #aaa;
+      padding: 5px 11px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .cat-pill.active { background: var(--blood-bright); border-color: var(--blood-bright); color: #fff; }
+
+    .modal-search { padding: 8px 12px; background: #0c0c0c; border-bottom: 1px solid #1a0808; }
+    .modal-search input {
+      width: 100%;
+      background: #141414;
+      border: 1px solid #290808;
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .perm-grid-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    @media(max-width: 420px) { .perm-grid-compact { grid-template-columns: 1fr; } }
+
+    .p-chip {
+      background: #080808;
+      border: 1px solid #220808;
+      padding: 7px 9px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      font-size: 11px;
+      color: #ccc;
+      user-select: none;
+    }
+    .p-chip:has(input:checked) { background: #180505; border-color: var(--blood-red); color: #fff; }
+    .p-chip input { accent-color: var(--blood-bright); width: 14px; height: 14px; }
+
+    .modal-footer {
+      padding: 10px 14px;
+      border-top: 1px solid #200606;
+      background: #120404;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-apply { background: var(--blood-bright); color: #fff; border: none; padding: 8px 16px; font-weight: bold; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .btn-clear { background: transparent; color: #888; border: 1px solid #331111; padding: 7px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+
+    /* APK Vault Styling */
+    .vault-list { display: flex; flex-direction: column; gap: 8px; }
+    .vault-item {
+      background: #090303;
+      border: 1px solid #280909;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .vault-item-info { display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden; }
+    .vault-item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid var(--blood-red);
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #000;
+    }
+    .vault-item-icon img, .vault-item-icon svg { width: 100%; height: 100%; object-fit: cover; }
+    .vault-meta { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+    .vault-meta-title { font-size: 13px; font-weight: bold; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vault-meta-sub { font-size: 10.5px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .vault-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .v-action-btn {
+      padding: 5px 9px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .v-btn-load { background: #1c0505; color: #ff7777; border-color: var(--blood-red); }
+    .v-btn-load:hover { background: var(--blood-red); color: #fff; }
+    .v-btn-update { background: var(--blood-bright); color: #fff; }
+    .v-btn-update:hover { background: #b91c1c; }
+    .v-btn-del { background: transparent; color: #777; border-color: #331111; }
+    .v-btn-del:hover { background: #260909; color: #ff4d4d; }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #140404;
+      border: 1px solid var(--blood-bright);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 20px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.85);
+      pointer-events: none;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      opacity: 0;
+      z-index: 9999;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-wrap">
+      <div class="brand"><span>&#x25C6;</span> DHAWAN STUDIO <span>PRO</span></div>
+      <span class="sub-brand-tag">welcome to shubh world</span>
+    </div>
+    <div class="header-actions">
+      <button class="vault-pill-btn" onclick="openVaultModal()">
+        <span>📦 My APKs</span>
+        <span class="vault-count" id="vaultHeaderBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Code & Config Panel -->
+    <div class="panel">
+      
+      <div class="title-row">
+        <span>App Configuration</span>
+      </div>
+
+      <div class="input-grid">
+        <label>
+          App Name
+          <input type="text" id="appName" value="Dhawan Studio Pro" oninput="handleInputSync()">
+        </label>
+        <label>
+          Package Identifier <span style="font-size:9.5px; color:#ff6666;">[🔒 Double-tap to edit]</span>
+          <input type="text" id="pkgName" class="locked-input" value="com.dhawan.studiopro" readonly>
+        </label>
+      </div>
+
+      <div class="icon-box">
+        <div class="icon-preview" id="iconDisplay">
+          <svg id="defaultSvgIcon" viewBox="0 0 512 512">
+            <rect width="512" height="512" fill="#060101" />
+            <polygon points="256,42 458,256 256,470 54,256" fill="#0f0202" stroke="#dc2626" stroke-width="16" />
+            <polygon points="256,86 414,256 256,426 98,256" fill="#000000" stroke="#440808" stroke-width="8" />
+            <polyline points="204,196 148,256 204,316" fill="none" stroke="#dc2626" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+            <polyline points="308,196 364,256 308,316" fill="none" stroke="#dc2626" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+            <line x1="280" y1="184" x2="232" y2="328" stroke="#ff2222" stroke-width="24" stroke-linecap="round" />
+            <circle cx="256" cy="256" r="12" fill="#ffffff" />
+          </svg>
+        </div>
+        <label style="flex: 1;">
+          Custom App Icon (.png / .jpg)
+          <input type="file" id="iconInput" accept="image/*" onchange="loadIcon(event)" style="font-size: 11px; padding: 2px; color: #aaa;">
+        </label>
+      </div>
+
+      <!-- Symmetrical 3 Popup Triggers -->
+      <div class="title-row">Engine, Security & Features</div>
+      <div class="popup-trigger-row">
+        <div class="modal-trigger-btn" onclick="openBuildModal()">
+          <span>⚙ Build Specs</span>
+          <span class="trigger-badge" id="buildBadge">v1.0.0</span>
+        </div>
+        <div class="modal-trigger-btn" onclick="openPermModal()">
+          <span>🛡 Permissions</span>
+          <span class="trigger-badge" id="permBadge">0 Active</span>
+        </div>
+        <div class="modal-trigger-btn" onclick="openExtraFeaturesModal()">
+          <span>⚡ Extra Features</span>
+          <span class="trigger-badge" id="extraFeaturesBadge">Options</span>
+        </div>
+      </div>
+
+      <div class="title-row">
+        <span id="sourceBoxHeader">Source HTML / CSS / JS</span>
+        <span style="font-size: 10px; color: #666; text-transform: none; font-weight: normal;">Ctrl+Enter to run</span>
+      </div>
+      
+      <!-- Completely Empty Box with Placeholder -->
+      <textarea id="sourceCode" spellcheck="false" placeholder="Write or paste your custom HTML, CSS, & JS code here..." oninput="saveCurrentWork()"></textarea>
+
+      <!-- 4 Action Buttons -->
+      <div class="btn-row">
+        <button class="action-btn btn-run" onclick="runCode(true)">Render View</button>
+        <button class="action-btn btn-build" onclick="saveAndExportBundle()">Export Bundle</button>
+        <button class="action-btn btn-sub" onclick="document.getElementById('bundleImporter').click()">Import Bundle</button>
+        <button class="action-btn btn-sub" onclick="openVaultModal()">📦 My APKs</button>
+      </div>
+      <input type="file" id="bundleImporter" accept=".json" style="display: none;" onchange="importProtectedBundle(event)">
+    </div>
+
+    <!-- Live Preview Panel with Real-Life Flagship 19.5:9 Ratio -->
+    <div class="preview-panel" id="previewSection">
+      <div class="preview-header">
+        <span class="title-row">Live Mobile Screen (19.5:9)</span>
+        <div class="preview-actions">
+          <button class="mini-ctrl-btn" onclick="runCode(false)" title="Reload Screen">&#x21bb; Reload</button>
+          <button class="mini-ctrl-btn" onclick="rotateDevice()">Rotate</button>
+        </div>
+      </div>
+
+      <div class="phone" id="phoneWrapper">
+        <div class="notch-bar">
+          <div class="camera"></div>
+        </div>
+        <iframe id="phoneScreen"></iframe>
+        <div class="nav-bar-pill">
+          <div class="gesture-indicator"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      welcome to shubh world
+    </footer>
+
+  </div>
+
+  <!-- POPUP 1: Build & Engine Config Modal -->
+  <div class="modal-backdrop" id="buildModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">⚙ Android Build & Engine Specs</div>
+        <button class="close-icon" onclick="closeBuildModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="cfg-sub-title">Application Versioning & Release Keystore</div>
+        <div class="cfg-grid">
+          <div class="cfg-item">
+            <span>Version Name</span>
+            <input type="text" id="cfgVerName" value="1.0.0" oninput="updateBuildBadge(); saveCurrentWork();">
+          </div>
+          <div class="cfg-item">
+            <span>Version Code</span>
+            <input type="number" id="cfgVerCode" value="1" min="1" oninput="saveCurrentWork()">
+          </div>
+          <div class="cfg-item">
+            <span>Keystore Key Alias <span style="font-size:9.5px; color:#ff6666;">[🔒 Double-tap]</span></span>
+            <input type="text" id="cfgKeyAlias" class="locked-input" value="dhawan_studio_key" readonly>
+          </div>
+          <div class="cfg-item">
+            <span>Orientation Lock</span>
+            <select id="cfgOrientation" onchange="saveCurrentWork()">
+              <option value="portrait">Portrait Only</option>
+              <option value="sensor">Auto / Sensor</option>
+              <option value="landscape">Landscape Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="cfg-sub-title">Native UX & System Bars</div>
+        <div class="cfg-grid">
+          <div class="cfg-item">
+            <span>Hardware Back-Button Behavior</span>
+            <select id="cfgBackButton" onchange="saveCurrentWork()">
+              <option value="smart_exit">Smart (History Back + Double-tap Exit)</option>
+              <option value="direct_exit">Direct Exit Immediately</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Touch Feel (Zoom & Highlight Lock)</span>
+            <select id="cfgTouchLock" onchange="saveCurrentWork()">
+              <option value="native_lock">Native Lock (No Zoom / No Highlight)</option>
+              <option value="browser_default">Browser Default (Allow Zoom)</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Status Bar Color (Hex)</span>
+            <input type="text" id="cfgStatusBarColor" value="#070707" oninput="saveCurrentWork()">
+          </div>
+          <div class="cfg-item">
+            <span>Cleartext HTTP (APIs)</span>
+            <select id="cfgCleartext" onchange="saveCurrentWork()">
+              <option value="true">Enabled (HTTP + HTTPS)</option>
+              <option value="false">Strict HTTPS Only</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Window Mode</span>
+            <select id="cfgImmersive" onchange="saveCurrentWork()">
+              <option value="fullscreen">Fullscreen (Immersive)</option>
+              <option value="normal">Standard Status Bar</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Hardware Acceleration</span>
+            <select id="cfgHwAccel" onchange="saveCurrentWork()">
+              <option value="true">Enabled (Smooth 60fps)</option>
+              <option value="false">Safe Software Mode</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-clear" onclick="resetBuildConfig()">Reset Default</button>
+        <button class="btn-apply" onclick="closeBuildModal()">Apply Specs</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 2: Permissions Modal -->
+  <div class="modal-backdrop" id="permModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🛡 Select Android Permissions</div>
+        <button class="close-icon" onclick="closePermModal()">&times;</button>
+      </div>
+
+      <div class="category-bar">
+        <button class="cat-pill active" onclick="setCategory('all', this)">All</button>
+        <button class="cat-pill" onclick="setCategory('sms', this)">SMS</button>
+        <button class="cat-pill" onclick="setCategory('call', this)">Calls</button>
+        <button class="cat-pill" onclick="setCategory('storage', this)">Files/Storage</button>
+        <button class="cat-pill" onclick="setCategory('system', this)">System/Net</button>
+        <button class="cat-pill" onclick="setCategory('hardware', this)">Hardware</button>
+      </div>
+
+      <div class="modal-search">
+        <input type="text" id="permSearch" placeholder="Fast search permission..." oninput="applyFilters()">
+      </div>
+
+      <div class="modal-body">
+        <div class="perm-grid-compact" id="permGrid">
+          <!-- SMS -->
+          <label class="p-chip" data-cat="sms"><input type="checkbox" checked data-perm="android.permission.READ_SMS" onchange="updatePermBadge(); saveCurrentWork();"> READ_SMS</label>
+          <label class="p-chip" data-cat="sms"><input type="checkbox" checked data-perm="android.permission.SEND_SMS" onchange="updatePermBadge(); saveCurrentWork();"> SEND_SMS</label>
+          <label class="p-chip" data-cat="sms"><input type="checkbox" checked data-perm="android.permission.RECEIVE_SMS" onchange="updatePermBadge(); saveCurrentWork();"> RECEIVE_SMS</label>
+          <label class="p-chip" data-cat="sms"><input type="checkbox" checked data-perm="android.permission.WRITE_SMS" onchange="updatePermBadge(); saveCurrentWork();"> WRITE_SMS</label>
+          <label class="p-chip" data-cat="sms"><input type="checkbox" data-perm="android.permission.RECEIVE_MMS" onchange="updatePermBadge(); saveCurrentWork();"> RECEIVE_MMS</label>
+
+          <!-- Calls -->
+          <label class="p-chip" data-cat="call"><input type="checkbox" checked data-perm="android.permission.READ_CALL_LOG" onchange="updatePermBadge(); saveCurrentWork();"> READ_CALL_LOG</label>
+          <label class="p-chip" data-cat="call"><input type="checkbox" checked data-perm="android.permission.WRITE_CALL_LOG" onchange="updatePermBadge(); saveCurrentWork();"> WRITE_CALL_LOG</label>
+          <label class="p-chip" data-cat="call"><input type="checkbox" checked data-perm="android.permission.READ_PHONE_STATE" onchange="updatePermBadge(); saveCurrentWork();"> PHONE_STATE</label>
+          <label class="p-chip" data-cat="call"><input type="checkbox" checked data-perm="android.permission.CALL_PHONE" onchange="updatePermBadge(); saveCurrentWork();"> CALL_PHONE</label>
+          <label class="p-chip" data-cat="call"><input type="checkbox" checked data-perm="android.permission.ANSWER_PHONE_CALLS" onchange="updatePermBadge(); saveCurrentWork();"> ANSWER_CALLS</label>
+
+          <!-- Storage -->
+          <label class="p-chip" data-cat="storage"><input type="checkbox" checked data-perm="android.permission.READ_EXTERNAL_STORAGE" onchange="updatePermBadge(); saveCurrentWork();"> READ_STORAGE</label>
+          <label class="p-chip" data-cat="storage"><input type="checkbox" checked data-perm="android.permission.WRITE_EXTERNAL_STORAGE" onchange="updatePermBadge(); saveCurrentWork();"> WRITE_STORAGE</label>
+          <label class="p-chip" data-cat="storage"><input type="checkbox" checked data-perm="android.permission.MANAGE_EXTERNAL_STORAGE" onchange="updatePermBadge(); saveCurrentWork();"> MANAGE_STORAGE</label>
+          <label class="p-chip" data-cat="storage"><input type="checkbox" checked data-perm="android.permission.READ_MEDIA_IMAGES" onchange="updatePermBadge(); saveCurrentWork();"> MEDIA_IMAGES</label>
+          <label class="p-chip" data-cat="storage"><input type="checkbox" checked data-perm="android.permission.READ_MEDIA_VIDEO" onchange="updatePermBadge(); saveCurrentWork();"> MEDIA_VIDEO</label>
+
+          <!-- Hardware -->
+          <label class="p-chip" data-cat="hardware"><input type="checkbox" data-perm="android.permission.CAMERA" onchange="updatePermBadge(); saveCurrentWork();"> CAMERA</label>
+          <label class="p-chip" data-cat="hardware"><input type="checkbox" data-perm="android.permission.RECORD_AUDIO" onchange="updatePermBadge(); saveCurrentWork();"> RECORD_AUDIO</label>
+          <label class="p-chip" data-cat="hardware"><input type="checkbox" data-perm="android.permission.ACCESS_FINE_LOCATION" onchange="updatePermBadge(); saveCurrentWork();"> FINE_LOCATION</label>
+
+          <!-- System -->
+          <label class="p-chip" data-cat="system"><input type="checkbox" checked data-perm="android.permission.INTERNET" onchange="updatePermBadge(); saveCurrentWork();"> INTERNET</label>
+          <label class="p-chip" data-cat="system"><input type="checkbox" checked data-perm="android.permission.ACCESS_NETWORK_STATE" onchange="updatePermBadge(); saveCurrentWork();"> NETWORK_STATE</label>
+          <label class="p-chip" data-cat="system"><input type="checkbox" checked data-perm="android.permission.SYSTEM_ALERT_WINDOW" onchange="updatePermBadge(); saveCurrentWork();"> OVERLAY_WINDOW</label>
+          <label class="p-chip" data-cat="system"><input type="checkbox" checked data-perm="android.permission.VIBRATE" onchange="updatePermBadge(); saveCurrentWork();"> VIBRATE</label>
+          <label class="p-chip" data-cat="system"><input type="checkbox" checked data-perm="android.permission.POST_NOTIFICATIONS" onchange="updatePermBadge(); saveCurrentWork();"> NOTIFICATIONS</label>
+          <label class="p-chip" data-cat="system"><input type="checkbox" checked data-perm="android.permission.RECEIVE_BOOT_COMPLETED" onchange="updatePermBadge(); saveCurrentWork();"> ON_BOOT</label>
+          <label class="p-chip" data-cat="system"><input type="checkbox" checked data-perm="android.permission.WAKE_LOCK" onchange="updatePermBadge(); saveCurrentWork();"> WAKE_LOCK</label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-clear" onclick="clearAllPerms()">Clear</button>
+        <button class="btn-apply" onclick="closePermModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 3: Dedicated Extra Features Modal -->
+  <div class="modal-backdrop" id="extraModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">⚡ Extra Features & Offline Creators</div>
+        <button class="close-icon" onclick="closeExtraFeaturesModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- 1. Text / Notes to App Maker -->
+        <div class="cfg-sub-title">📄 Text / Notes to App (Zero Coding)</div>
+        <div class="gen-card">
+          <input type="text" id="txtDocTitle" placeholder="Document / Book Title (e.g. My Secret Notes)">
+          <textarea id="txtDocBody" style="min-height: 80px; font-size: 11.5px;" placeholder="Paste your plain text, paragraphs, or lists here..."></textarea>
+          <button class="btn-apply" onclick="convertTextToApp()" style="align-self: flex-start;">Generate Reader App</button>
+        </div>
+
+        <!-- 2. Audio / Video Media Player Shell -->
+        <div class="cfg-sub-title">🎬 Offline Audio / Video Player App Shell</div>
+        <div class="gen-card">
+          <div class="cfg-grid">
+            <div class="cfg-item">
+              <span>Media Type</span>
+              <select id="mediaType">
+                <option value="audio">Audio / Podcast Player</option>
+                <option value="video">Video Player Shell</option>
+              </select>
+            </div>
+            <div class="cfg-item">
+              <span>Media Title</span>
+              <input type="text" id="mediaTitle" placeholder="e.g. Audio Track">
+            </div>
+          </div>
+          <input type="text" id="mediaSource" placeholder="Audio/Video Link or local file name (e.g. track.mp3 / video.mp4)">
+          <button class="btn-apply" onclick="generateMediaApp()" style="align-self: flex-start;">Generate Player App</button>
+        </div>
+
+        <!-- 3. Desktop Mode & Live Web View Settings -->
+        <div class="cfg-sub-title">🌐 Live Web Portal & Viewport Mode</div>
+        <div class="cfg-grid">
+          <div class="cfg-item">
+            <span>Target Mode</span>
+            <select id="cfgSourceMode" onchange="handleExtraModeChange()">
+              <option value="code">Local Code / Generator</option>
+              <option value="url">Live Website URL</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Desktop Screen Mode</span>
+            <select id="cfgDesktopMode" onchange="saveCurrentWork()">
+              <option value="false">Mobile Responsive View</option>
+              <option value="true">Force Desktop View (Computer View)</option>
+            </select>
+          </div>
+          <div class="cfg-item" style="grid-column: span 2;">
+            <span>Website URL (If Live Mode Active)</span>
+            <input type="text" id="cfgWebUrl" placeholder="https://yourwebsite.com" oninput="saveCurrentWork()">
+          </div>
+        </div>
+
+        <!-- 4. Security & Hardware Runtime -->
+        <div class="cfg-sub-title">🔒 Source Security & Hardware Tools</div>
+        <div class="cfg-grid">
+          <div class="cfg-item">
+            <span>Owner PIN Lock</span>
+            <input type="password" id="cfgOwnerPin" placeholder="Set private PIN (e.g. 7860)" oninput="saveCurrentWork()">
+          </div>
+          <div class="cfg-item">
+            <span>Code Encryption</span>
+            <select id="cfgCodeEncrypt" onchange="saveCurrentWork()">
+              <option value="encrypted">AES / Scramble Encrypted</option>
+              <option value="plain">Plain Source</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Native JS Bridge</span>
+            <select id="cfgJsBridge" onchange="saveCurrentWork()">
+              <option value="enabled">Enabled (Toast, Vibrate, Share, Copy)</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>File Downloads</span>
+            <select id="cfgAllowDownloads" onchange="saveCurrentWork()">
+              <option value="true">Enabled (PDFs, Images, Blobs)</option>
+              <option value="false">Disabled</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Keep Screen On</span>
+            <select id="cfgKeepScreenOn" onchange="saveCurrentWork()">
+              <option value="disabled">Standard Screen Sleep</option>
+              <option value="enabled">Always On (No Sleep)</option>
+            </select>
+          </div>
+          <div class="cfg-item">
+            <span>Anti-Inspect Guard</span>
+            <select id="cfgAntiInspect" onchange="saveCurrentWork()">
+              <option value="enabled">Enabled (Block Inspect/F12)</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 5. Fast CDN Injector -->
+        <div class="cfg-sub-title">📦 Fast CDN Library Injector</div>
+        <div class="cfg-item">
+          <div style="display: flex; gap: 8px;">
+            <select id="cdnSelector" style="flex: 1;">
+              <option value="tailwind">Tailwind CSS (Script CDN)</option>
+              <option value="fontawesome">FontAwesome 6 Icons</option>
+              <option value="jquery">jQuery 3.7 Core</option>
+              <option value="confetti">Canvas Confetti Animation</option>
+            </select>
+            <button class="btn-apply" onclick="injectCdnLibrary()" style="white-space: nowrap;">Inject Tag</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-clear" onclick="resetExtraFeatures()">Reset</button>
+        <button class="btn-apply" onclick="closeExtraFeaturesModal()">Apply Features</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 4: APK Directory & Update Manager Modal -->
+  <div class="modal-backdrop" id="vaultModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">📦 My APK Directory & Updates</div>
+        <button class="close-icon" onclick="closeVaultModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #220606; padding-bottom: 8px;">
+          <span style="font-size: 11px; color: #888;">Manage, load, or bump versions of saved apps</span>
+          <button class="v-action-btn v-btn-update" onclick="saveCurrentToVault()">+ Save Current as New</button>
+        </div>
+        <div class="vault-list" id="vaultListContainer"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-clear" onclick="clearEntireVault()">Clear Vault</button>
+        <button class="btn-apply" onclick="closeVaultModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">Ready</div>
+
+  <script>
+    let iconBase64 = null;
+    let activeCat = "all";
+    let activeEditingId = null;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function handleInputSync() {
+      const pkgInput = document.getElementById('pkgName');
+      if (pkgInput.hasAttribute('readonly')) {
+        autoSyncPackageName();
+      }
+      updateDynamicManifest();
+      saveCurrentWork();
+    }
+
+    function autoSyncPackageName() {
+      const name = document.getElementById('appName').value.trim();
+      const sanitized = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const suffix = sanitized ? sanitized : 'app';
+      document.getElementById('pkgName').value = 'com.dhawan.' + suffix;
+    }
+
+    /* Update PWA Manifest dynamically based on App Name and Icon */
+    function updateDynamicManifest() {
+      const appName = document.getElementById('appName').value.trim() || "Dhawan Studio Pro";
+      const iconsArr = iconBase64 ? [{ src: iconBase64, sizes: "192x192", type: "image/png" }] : [];
+      
+      const manifestObj = {
+        name: appName,
+        short_name: appName.replace(/\s+/g, ''),
+        start_url: ".",
+        display: "standalone",
+        background_color: "#070707",
+        theme_color: "#070707",
+        icons: iconsArr
+      };
+
+      const stringified = JSON.stringify(manifestObj);
+      const blob = new Blob([stringified], { type: 'application/manifest+json' });
+      const manifestUrl = URL.createObjectURL(blob);
+      document.getElementById('dynamicManifest').setAttribute('href', manifestUrl);
+    }
+
+    /* Double-Tap Lock Engine */
+    function attachDoubleTapProtection(elementId, friendlyName) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      let lastTapTime = 0;
+
+      function triggerUnlock() {
+        el.removeAttribute('readonly');
+        el.focus();
+        el.select();
+        showToast(`🔓 ${friendlyName} Unlocked for editing`);
+      }
+
+      el.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        triggerUnlock();
+      });
+
+      el.addEventListener('touchend', function(e) {
+        const currentTime = Date.now();
+        const tapGap = currentTime - lastTapTime;
+        if (tapGap < 350 && tapGap > 0) {
+          e.preventDefault();
+          triggerUnlock();
+        } else {
+          if (el.hasAttribute('readonly')) {
+            showToast(`🔒 Double-tap to edit ${friendlyName}`);
+          }
+        }
+        lastTapTime = currentTime;
+      });
+
+      el.addEventListener('click', function() {
+        if (el.hasAttribute('readonly')) {
+          showToast(`🔒 Double-tap to edit ${friendlyName}`);
+        }
+      });
+
+      el.addEventListener('blur', function() {
+        el.setAttribute('readonly', 'true');
+        saveCurrentWork();
+        showToast(`🔒 ${friendlyName} Locked`);
+      });
+    }
+
+    /* Modal Handlers */
+    function openBuildModal() { document.getElementById('buildModal').classList.add('active'); }
+    function closeBuildModal() { document.getElementById('buildModal').classList.remove('active'); updateBuildBadge(); }
+
+    function openPermModal() { document.getElementById('permModal').classList.add('active'); }
+    function closePermModal() { document.getElementById('permModal').classList.remove('active'); updatePermBadge(); }
+
+    function openExtraFeaturesModal() { document.getElementById('extraModal').classList.add('active'); }
+    function closeExtraFeaturesModal() { 
+      document.getElementById('extraModal').classList.remove('active'); 
+      handleExtraModeChange();
+      saveCurrentWork();
+    }
+
+    function openVaultModal() { 
+      renderVaultList();
+      document.getElementById('vaultModal').classList.add('active'); 
+    }
+    function closeVaultModal() { document.getElementById('vaultModal').classList.remove('active'); }
+
+    function updateBuildBadge() {
+      const v = document.getElementById('cfgVerName').value.trim() || '1.0.0';
+      document.getElementById('buildBadge').innerText = 'v' + v;
+    }
+
+    function handleExtraModeChange() {
+      const mode = document.getElementById('cfgSourceMode').value;
+      const editor = document.getElementById('sourceCode');
+      const headerTitle = document.getElementById('sourceBoxHeader');
+
+      if (mode === 'url') {
+        const url = document.getElementById('cfgWebUrl').value.trim();
+        headerTitle.innerText = "Target Web Portal (Live URL Mode Active)";
+        editor.setAttribute('placeholder', `Live Web URL Mode is active: ${url || 'Set URL in Extra Features'}`);
+        document.getElementById('extraFeaturesBadge').innerText = "Live URL";
+      } else {
+        headerTitle.innerText = "Source HTML / CSS / JS";
+        editor.setAttribute('placeholder', "Write or paste your custom HTML, CSS, & JS code here...");
+        document.getElementById('extraFeaturesBadge').innerText = "Options";
+      }
+    }
+
+    /* 1. Text to App Converter */
+    function convertTextToApp() {
+      const title = document.getElementById('txtDocTitle').value.trim() || "My Offline Notes";
+      const rawText = document.getElementById('txtDocBody').value.trim();
+
+      if (!rawText) {
+        showToast("Please enter some text or notes first!");
+        return;
+      }
+
+      const formattedParagraphs = rawText.split(/\n\s*\n/).map(p => {
+        return `<p style="margin-bottom: 14px; line-height: 1.6; color: #ddd; font-size: 15px;">${p.replace(/\n/g, '<br>')}</p>`;
+      }).join('\n');
+
+      const fullHtml = `<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #070707; color: #fff; padding: 20px 16px 40px; }
+    header { border-bottom: 2px solid #8b0000; padding-bottom: 12px; margin-bottom: 20px; }
+    h1 { font-size: 20px; color: #ff4d4d; font-weight: 800; letter-spacing: 0.5px; }
+    .content-box { background: #111; border: 1px solid #220808; border-radius: 10px; padding: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>${title}</h1>
+  </header>
+  <div class="content-box">
+${formattedParagraphs}
+  </div>
+</body>
+</html>`;
+
+      document.getElementById('sourceCode').value = fullHtml;
+      document.getElementById('appName').value = title;
+      autoSyncPackageName();
+      document.getElementById('cfgSourceMode').value = 'code';
+      handleExtraModeChange();
+      closeExtraFeaturesModal();
+      runCode(false);
+      showToast('Reader App Generated!');
+    }
+
+    /* 2. Media Player App Shell Generator */
+    function generateMediaApp() {
+      const type = document.getElementById('mediaType').value;
+      const title = document.getElementById('mediaTitle').value.trim() || "Offline Media Player";
+      const source = document.getElementById('mediaSource').value.trim() || "media.mp3";
+
+      let mediaElementHtml = "";
+      if (type === 'audio') {
+        mediaElementHtml = `
+        <div style="text-align: center; margin: 30px 0;">
+          <div style="width: 110px; height: 110px; background: #1a0808; border: 2px solid #dc2626; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(220,38,38,0.4);">
+            <svg viewBox="0 0 24 24" style="width: 44px; height: 44px; fill: #ff4d4d;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          </div>
+          <audio controls style="width: 100%; filter: invert(0.9) hue-rotate(180deg);" src="${source}">Your device does not support audio playback.</audio>
+        </div>`;
+      } else {
+        mediaElementHtml = `
+        <div style="border-radius: 10px; overflow: hidden; border: 1px solid #331111; margin: 15px 0; background: #000;">
+          <video controls playsinline style="width: 100%; display: block;" src="${source}">Your device does not support video playback.</video>
+        </div>`;
+      }
+
+      const fullHtml = `<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
+    body { background: #070707; color: #fff; padding: 20px 16px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+    .player-card { background: #111; border: 1px solid #220808; border-radius: 14px; padding: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.8); }
+    h2 { font-size: 18px; color: #ff4d4d; text-align: center; margin-bottom: 4px; }
+    p.sub { font-size: 12px; color: #888; text-align: center; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="player-card">
+    <h2>${title}</h2>
+    <p class="sub">Standalone Native Media Shell</p>
+    ${mediaElementHtml}
+  </div>
+</body>
+</html>`;
+
+      document.getElementById('sourceCode').value = fullHtml;
+      document.getElementById('appName').value = title;
+      autoSyncPackageName();
+      document.getElementById('cfgSourceMode').value = 'code';
+      handleExtraModeChange();
+      closeExtraFeaturesModal();
+      runCode(false);
+      showToast('Media Player App Generated!');
+    }
+
+    function resetBuildConfig() {
+      document.getElementById('cfgVerName').value = '1.0.0';
+      document.getElementById('cfgVerCode').value = '1';
+      document.getElementById('cfgKeyAlias').value = 'dhawan_studio_key';
+      document.getElementById('cfgOrientation').value = 'portrait';
+      document.getElementById('cfgCleartext').value = 'true';
+      document.getElementById('cfgImmersive').value = 'fullscreen';
+      document.getElementById('cfgHwAccel').value = 'true';
+      document.getElementById('cfgBackButton').value = 'smart_exit';
+      document.getElementById('cfgTouchLock').value = 'native_lock';
+      document.getElementById('cfgStatusBarColor').value = '#070707';
+      updateBuildBadge();
+      saveCurrentWork();
+      showToast('Build specs reset');
+    }
+
+    function resetExtraFeatures() {
+      document.getElementById('cfgSourceMode').value = 'code';
+      document.getElementById('cfgDesktopMode').value = 'false';
+      document.getElementById('cfgWebUrl').value = '';
+      document.getElementById('cfgOwnerPin').value = '';
+      document.getElementById('cfgCodeEncrypt').value = 'encrypted';
+      document.getElementById('cfgAntiInspect').value = 'enabled';
+      document.getElementById('cfgJsBridge').value = 'enabled';
+      document.getElementById('cfgAllowDownloads').value = 'true';
+      document.getElementById('cfgKeepScreenOn').value = 'disabled';
+      handleExtraModeChange();
+      saveCurrentWork();
+      showToast('Extra features reset');
+    }
+
+    function setCategory(cat, btn) {
+      activeCat = cat;
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const q = document.getElementById('permSearch').value.toLowerCase();
+      const chips = document.querySelectorAll('.p-chip');
+
+      chips.forEach(chip => {
+        const matchesCat = (activeCat === 'all' || chip.getAttribute('data-cat') === activeCat);
+        const matchesQuery = chip.textContent.toLowerCase().includes(q);
+        chip.style.display = (matchesCat && matchesQuery) ? 'flex' : 'none';
+      });
+    }
+
+    function clearAllPerms() {
+      const cbs = document.querySelectorAll('#permGrid input[type="checkbox"]');
+      cbs.forEach(cb => cb.checked = false);
+      updatePermBadge();
+      saveCurrentWork();
+      showToast('Permissions cleared');
+    }
+
+    function updatePermBadge() {
+      const count = document.querySelectorAll('#permGrid input[type="checkbox"]:checked').length;
+      document.getElementById('permBadge').innerText = count + " Active";
+    }
+
+    /* Client-Side Encryption */
+    function xorCipher(text, key) {
+      const k = key || "DHAWAN_SECURITY_KEY_2026";
+      let result = "";
+      for (let i = 0; i < text.length; i++) {
+        result += String.fromCharCode(text.charCodeAt(i) ^ k.charCodeAt(i % k.length));
+      }
+      return btoa(unescape(encodeURIComponent(result)));
+    }
+
+    function xorDecipher(base64Text, key) {
+      const k = key || "DHAWAN_SECURITY_KEY_2026";
+      const raw = decodeURIComponent(escape(atob(base64Text)));
+      let result = "";
+      for (let i = 0; i < raw.length; i++) {
+        result += String.fromCharCode(raw.charCodeAt(i) ^ k.charCodeAt(i % k.length));
+      }
+      return result;
+    }
+
+    function generateAntiTheftHtml(rawCode, pinKey, blockInspect) {
+      const secret = pinKey || "DHAWAN_PRO_PROTECT";
+      const cipherText = xorCipher(rawCode, secret);
+
+      const inspectGuard = blockInspect ? `
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+          if (e.keyCode === 123 || (e.ctrlKey && (e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || e.keyCode === 85 || e.keyCode === 83)) {
+            e.preventDefault(); return false;
+          }
+        });
+      ` : '';
+
+      return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Protected App</title>
+  <style>body{background:#000;color:#888;font-family:sans-serif;}</style>
+  <script>
+    (function(){
+      ${inspectGuard}
+      function _d(c, k){
+        var r = decodeURIComponent(escape(atob(c))), s = "";
+        for(var i=0; i<r.length; i++){ s += String.fromCharCode(r.charCodeAt(i) ^ k.charCodeAt(i % k.length)); }
+        return s;
+      }
+      var _c = "${cipherText}";
+      var _k = "${secret}";
+      window.addEventListener('DOMContentLoaded', function(){
+        try {
+          var html = _d(_c, _k);
+          document.open();
+          document.write(html);
+          document.close();
+        } catch(e) {
+          document.body.innerHTML = "<h3 style='color:#ff4444;text-align:center;padding-top:40px;'>Access Denied / Tampered Code</h3>";
+        }
+      });
+    })();
+  <\/script>
+</head>
+<body>
+  <noscript>Security Verification Failed.</noscript>
+</body>
+</html>`;
+    }
+
+    function injectCdnLibrary() {
+      const cdn = document.getElementById('cdnSelector').value;
+      let tag = "";
+      if (cdn === 'tailwind') tag = '<script src="https://cdn.tailwindcss.com"><\/script>\n';
+      else if (cdn === 'fontawesome') tag = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">\n';
+      else if (cdn === 'jquery') tag = '<script src="https://code.jquery.com/jquery-3.7.1.min.js"><\/script>\n';
+      else if (cdn === 'confetti') tag = '<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"><\/script>\n';
+
+      const editor = document.getElementById('sourceCode');
+      if (editor.value.includes('<head>')) {
+        editor.value = editor.value.replace('<head>', '<head>\n  ' + tag);
+      } else {
+        editor.value = tag + editor.value;
+      }
+      saveCurrentWork();
+      showToast('Library injected into code!');
+      closeExtraFeaturesModal();
+    }
+
+    /* Live Preview & Real-Life Scale Engine */
+    function runCode(autoScroll = false) {
+      const screen = document.getElementById('phoneScreen');
+      const mode = document.getElementById('cfgSourceMode').value;
+      const isDesktop = document.getElementById('cfgDesktopMode').value === 'true';
+
+      if (mode === 'url') {
+        const url = document.getElementById('cfgWebUrl').value.trim();
+        if (!url) {
+          showToast('Please set Website URL in Extra Features');
+          return;
+        }
+        screen.srcdoc = "";
+        screen.src = url.startsWith('http') ? url : 'https://' + url;
+        showToast('Live Web Portal Rendered');
+      } else {
+        const code = document.getElementById('sourceCode').value;
+        const touchLock = document.getElementById('cfgTouchLock').value === 'native_lock';
+        const statusBarColor = document.getElementById('cfgStatusBarColor').value.trim() || '#070707';
+        const jsBridgeActive = document.getElementById('cfgJsBridge').value === 'enabled';
+
+        let injectedHead = `<meta name="theme-color" content="${statusBarColor}">`;
+        
+        if (isDesktop) {
+          injectedHead += `<meta name="viewport" content="width=1200, initial-scale=0.25, user-scalable=yes">`;
+        }
+
+        if (jsBridgeActive) {
+          injectedHead += `<script>
+            window.AndroidBridge = {
+              showToast: function(msg) { window.parent.postMessage({type: 'NATIVE_TOAST', msg: msg}, '*'); },
+              vibrate: function(ms) { if(navigator.vibrate) navigator.vibrate(ms||100); window.parent.postMessage({type: 'NATIVE_TOAST', msg: '⚡ Vibrate: ' + (ms||100) + 'ms'}, '*'); },
+              copy: function(text) { navigator.clipboard.writeText(text); window.parent.postMessage({type: 'NATIVE_TOAST', msg: '📋 Copied: ' + text}, '*'); },
+              share: function(text) { if(navigator.share) { navigator.share({text: text}); } else { window.parent.postMessage({type: 'NATIVE_TOAST', msg: '📤 Share: ' + text}, '*'); } },
+              beep: function() { window.parent.postMessage({type: 'NATIVE_TOAST', msg: '🔔 Beep Audio'}, '*'); }
+            };
+          <\/script>`;
+        }
+
+        if (touchLock) {
+          injectedHead += `<style>
+            * { -webkit-tap-highlight-color: transparent; }
+            body { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+            input, textarea, select { -webkit-user-select: auto; user-select: auto; }
+          </style>`;
+        }
+
+        let finalHtml = code;
+        if (finalHtml.includes('<head>')) {
+          finalHtml = finalHtml.replace('<head>', '<head>\n  ' + injectedHead);
+        } else {
+          finalHtml = injectedHead + finalHtml;
+        }
+
+        screen.removeAttribute('src');
+        screen.srcdoc = finalHtml;
+        showToast('Rendered in Mobile Screen');
+      }
+
+      if (autoScroll) {
+        document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'NATIVE_TOAST') {
+        showToast(e.data.msg);
+      }
+    });
+
+    function rotateDevice() {
+      const p = document.getElementById('phoneWrapper');
+      p.classList.toggle('landscape');
+      showToast(p.classList.contains('landscape') ? 'Landscape Mode' : 'Portrait Mode');
+    }
+
+    /* Fixed Auto-Compressing Icon Loader */
+    function loadIcon(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast('Valid image (.png / .jpg) chunein');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onerror = function() {
+        showToast('Error! Phone storage se select karein.');
+      };
+
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = 192;
+          canvas.height = 192;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 192, 192);
+
+          iconBase64 = canvas.toDataURL('image/png', 0.85);
+          document.getElementById('iconDisplay').innerHTML = `<img src="${iconBase64}">`;
+          updateDynamicManifest();
+          saveCurrentWork();
+          showToast('Icon Successfully Set (Auto-Optimized)');
+        };
+        img.src = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+      event.target.value = '';
+    }
+
+    function getDefaultIconDataUri() {
+      const svg = document.getElementById('defaultSvgIcon');
+      if (!svg) return "";
+      const s = new XMLSerializer().serializeToString(svg);
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s);
+    }
+
+    function getSelectedPermissions() {
+      const list = [];
+      const checkboxes = document.querySelectorAll('#permGrid input[type="checkbox"]:checked');
+      checkboxes.forEach(cb => {
+        const perm = cb.getAttribute('data-perm');
+        if (perm) list.push(perm);
+      });
+      return list;
+    }
+
+    function generateFullManifest(name, pkg, perms, orientation, cleartext, immersive, statusBarColor) {
+      const permsXml = perms.map(p => `    <uses-permission android:name="${p}" />`).join('\n');
+      const themeAttr = immersive === 'fullscreen' ? '@android:style/Theme.NoTitleBar.Fullscreen' : '@android:style/Theme.DeviceDefault';
+      return `<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="${pkg}">
+
+${permsXml}
+
+    <application
+        android:label="${name}"
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="${cleartext}"
+        android:theme="${themeAttr}">
+        
+        <meta-data android:name="android.theme.statusBarColor" android:value="${statusBarColor}" />
+        
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="${orientation}"
+            android:configChanges="orientation|keyboardHidden|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>`;
+    }
+
+    /* APK Vault Engine */
+    function getVaultData() {
+      try {
+        return JSON.parse(localStorage.getItem('dhawan_apk_vault') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveVaultData(arr) {
+      localStorage.setItem('dhawan_apk_vault', JSON.stringify(arr));
+      updateVaultHeaderBadge();
+    }
+
+    function updateVaultHeaderBadge() {
+      const list = getVaultData();
+      document.getElementById('vaultHeaderBadge').innerText = list.length;
+    }
+
+    function buildCurrentPayload() {
+      const name = document.getElementById('appName').value.trim() || "App";
+      const pkg = document.getElementById('pkgName').value.trim() || "com.dhawan.app";
+      const code = document.getElementById('sourceCode').value;
+
+      const sourceMode = document.getElementById('cfgSourceMode').value;
+      const desktopMode = document.getElementById('cfgDesktopMode').value === 'true';
+      const webUrl = document.getElementById('cfgWebUrl').value.trim();
+      const ownerPin = document.getElementById('cfgOwnerPin').value.trim();
+      const codeEncrypt = document.getElementById('cfgCodeEncrypt').value;
+      const antiInspect = document.getElementById('cfgAntiInspect').value === 'enabled';
+      const jsBridge = document.getElementById('cfgJsBridge').value === 'enabled';
+      const allowDownloads = document.getElementById('cfgAllowDownloads').value === 'true';
+      const keepScreenOn = document.getElementById('cfgKeepScreenOn').value === 'enabled';
+
+      const verName = document.getElementById('cfgVerName').value.trim() || '1.0.0';
+      const verCode = parseInt(document.getElementById('cfgVerCode').value) || 1;
+      const keyAlias = document.getElementById('cfgKeyAlias').value.trim() || 'dhawan_studio_key';
+      const orientation = document.getElementById('cfgOrientation').value;
+      const cleartext = document.getElementById('cfgCleartext').value === 'true';
+      const immersive = document.getElementById('cfgImmersive').value;
+      const hwAccel = document.getElementById('cfgHwAccel').value === 'true';
+      const backButton = document.getElementById('cfgBackButton').value;
+      const touchLock = document.getElementById('cfgTouchLock').value;
+      const statusBarColor = document.getElementById('cfgStatusBarColor').value.trim() || '#070707';
+      const selectedPerms = getSelectedPermissions();
+
+      return {
+        id: activeEditingId || 'apk_' + Date.now(),
+        app_name: name,
+        package_name: pkg,
+        source_mode: sourceMode,
+        desktop_mode: desktopMode,
+        web_url: webUrl,
+        owner_pin: ownerPin,
+        code_encrypted: codeEncrypt === 'encrypted',
+        anti_inspect: antiInspect,
+        js_bridge_enabled: jsBridge,
+        allow_downloads: allowDownloads,
+        keep_screen_on: keepScreenOn,
+        version_name: verName,
+        version_code: verCode,
+        key_alias: keyAlias,
+        orientation: orientation,
+        cleartext: cleartext,
+        immersive: immersive,
+        hw_accel: hwAccel,
+        back_button: backButton,
+        touch_lock: touchLock,
+        status_bar_color: statusBarColor,
+        permissions: selectedPerms,
+        icon: iconBase64 || getDefaultIconDataUri(),
+        code: code,
+        updated_at: new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
+      };
+    }
+
+    function saveCurrentToVault() {
+      const payload = buildCurrentPayload();
+      const vault = getVaultData();
+      const idx = vault.findIndex(x => x.id === payload.id);
+      
+      if (idx > -1) {
+        vault[idx] = payload;
+      } else {
+        vault.unshift(payload);
+        activeEditingId = payload.id;
+      }
+
+      saveVaultData(vault);
+      renderVaultList();
+      showToast(`Saved "${payload.app_name}" to Vault`);
+    }
+
+    function renderVaultList() {
+      const list = getVaultData();
+      const container = document.getElementById('vaultListContainer');
+
+      if (list.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 25px 0; color:#666; font-size:12px;">No APKs created yet. Click "Export Bundle" or "+ Save Current" to record apps.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(item => `
+        <div class="vault-item">
+          <div class="vault-item-info">
+            <div class="vault-item-icon">
+              <img src="${item.icon}">
+            </div>
+            <div class="vault-meta">
+              <div class="vault-meta-title">${item.app_name} ${item.owner_pin ? '🔒' : ''}</div>
+              <div class="vault-meta-sub">${item.package_name} • <span style="color:#ff6666;">v${item.version_name} (${item.version_code})</span> ${item.source_mode === 'url' ? '🌐 Web' : '📄 Code'}</div>
+              <div style="font-size:9.5px; color:#555;">Updated: ${item.updated_at}</div>
+            </div>
+          </div>
+          <div class="vault-item-actions">
+            <button class="v-action-btn v-btn-load" onclick="loadFromVault('${item.id}', false)" title="Load into studio">Edit</button>
+            <button class="v-action-btn v-btn-update" onclick="loadFromVault('${item.id}', true)" title="Bump version code & name">Update (+1)</button>
+            <button class="v-action-btn v-btn-del" onclick="deleteFromVault('${item.id}')">&times;</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadFromVault(id, bumpVersion = false) {
+      const vault = getVaultData();
+      const item = vault.find(x => x.id === id);
+      if (!item) return;
+
+      if (item.owner_pin) {
+        const inputPin = prompt("🔒 Enter Owner Security PIN to open this APK:");
+        if (inputPin !== item.owner_pin) {
+          showToast("Access Denied! Incorrect PIN.");
+          return;
+        }
+      }
+
+      activeEditingId = item.id;
+      document.getElementById('appName').value = item.app_name;
+      document.getElementById('pkgName').value = item.package_name;
+      document.getElementById('sourceCode').value = item.code || '';
+
+      document.getElementById('cfgSourceMode').value = item.source_mode || 'code';
+      document.getElementById('cfgDesktopMode').value = item.desktop_mode ? 'true' : 'false';
+      document.getElementById('cfgWebUrl').value = item.web_url || '';
+      document.getElementById('cfgOwnerPin').value = item.owner_pin || '';
+      document.getElementById('cfgCodeEncrypt').value = item.code_encrypted ? 'encrypted' : 'plain';
+      document.getElementById('cfgAntiInspect').value = item.anti_inspect ? 'enabled' : 'disabled';
+      document.getElementById('cfgJsBridge').value = item.js_bridge_enabled ? 'enabled' : 'disabled';
+      document.getElementById('cfgAllowDownloads').value = item.allow_downloads ? 'true' : 'false';
+      document.getElementById('cfgKeepScreenOn').value = item.keep_screen_on ? 'enabled' : 'disabled';
+      handleExtraModeChange();
+
+      let vCode = parseInt(item.version_code) || 1;
+      let vName = item.version_name || "1.0.0";
+
+      if (bumpVersion) {
+        vCode += 1;
+        const parts = vName.split('.');
+        if (parts.length === 3 && !isNaN(parts[2])) {
+          parts[2] = parseInt(parts[2]) + 1;
+          vName = parts.join('.');
+        } else {
+          vName = vName + ".1";
+        }
+        showToast(`Loaded & Bumped to v${vName} (Code ${vCode})`);
+      } else {
+        showToast(`Loaded "${item.app_name}"`);
+      }
+
+      document.getElementById('cfgVerCode').value = vCode;
+      document.getElementById('cfgVerName').value = vName;
+      document.getElementById('cfgKeyAlias').value = item.key_alias || 'dhawan_studio_key';
+      document.getElementById('cfgOrientation').value = item.orientation || 'portrait';
+      document.getElementById('cfgCleartext').value = item.cleartext ? 'true' : 'false';
+      document.getElementById('cfgImmersive').value = item.immersive || 'fullscreen';
+      document.getElementById('cfgHwAccel').value = item.hw_accel ? 'true' : 'false';
+      document.getElementById('cfgBackButton').value = item.back_button || 'smart_exit';
+      document.getElementById('cfgTouchLock').value = item.touch_lock || 'native_lock';
+      document.getElementById('cfgStatusBarColor').value = item.status_bar_color || '#070707';
+
+      const checkboxes = document.querySelectorAll('#permGrid input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        cb.checked = (item.permissions || []).includes(cb.getAttribute('data-perm'));
+      });
+
+      if (item.icon) {
+        iconBase64 = item.icon;
+        document.getElementById('iconDisplay').innerHTML = `<img src="${iconBase64}">`;
+        updateDynamicManifest();
+      }
+
+      updatePermBadge();
+      updateBuildBadge();
+      closeVaultModal();
+      runCode(false);
+      saveCurrentWork();
+    }
+
+    function deleteFromVault(id) {
+      let vault = getVaultData();
+      const item = vault.find(x => x.id === id);
+      if (item && item.owner_pin) {
+        const pin = prompt("🔒 Enter Owner PIN to confirm deletion:");
+        if (pin !== item.owner_pin) {
+          showToast("Deletion Blocked: Wrong PIN");
+          return;
+        }
+      }
+      vault = vault.filter(x => x.id !== id);
+      saveVaultData(vault);
+      renderVaultList();
+      showToast('APK entry deleted');
+    }
+
+    function clearEntireVault() {
+      if (confirm('Saare saved APKs delete karne hain?')) {
+        saveVaultData([]);
+        renderVaultList();
+        showToast('Vault cleared');
+      }
+    }
+
+    function saveAndExportBundle() {
+      saveCurrentToVault();
+
+      const payload = buildCurrentPayload();
+      
+      if (payload.keep_screen_on && !payload.permissions.includes('android.permission.WAKE_LOCK')) {
+        payload.permissions.push('android.permission.WAKE_LOCK');
+      }
+
+      const manifestXml = generateFullManifest(
+        payload.app_name,
+        payload.package_name,
+        payload.permissions,
+        payload.orientation,
+        payload.cleartext,
+        payload.immersive,
+        payload.status_bar_color
+      );
+
+      let finalIndexHtml = payload.code || '';
+      let isEncrypted = false;
+
+      if (payload.source_mode === 'url') {
+        const metaViewport = payload.desktop_mode ? '<meta name="viewport" content="width=1200, initial-scale=0.25">' : '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+        finalIndexHtml = `<!DOCTYPE html><html><head><meta charset="utf-8">${metaViewport}<title>${payload.app_name}</title><style>html,body,iframe{margin:0;padding:0;width:100%;height:100%;border:none;overflow:hidden;background:#000;}</style></head><body><iframe src="${payload.web_url}"></iframe></body></html>`;
+      } else if (payload.code_encrypted && payload.code) {
+        finalIndexHtml = generateAntiTheftHtml(payload.code, payload.owner_pin, payload.anti_inspect);
+        isEncrypted = true;
+      }
+
+      const bundle = {
+        app_name: payload.app_name,
+        package_name: payload.package_name,
+        source_mode: payload.source_mode,
+        live_portal_url: payload.web_url || null,
+        is_desktop_mode: payload.desktop_mode,
+        is_protected: isEncrypted,
+        has_owner_pin: !!payload.owner_pin,
+        protected_source: (isEncrypted && payload.code) ? xorCipher(payload.code, payload.owner_pin || "DHAWAN_PRO") : null,
+        build_config: {
+          version_name: payload.version_name,
+          version_code: payload.version_code,
+          release_keystore_alias: payload.key_alias,
+          screen_orientation: payload.orientation,
+          cleartext_traffic: payload.cleartext,
+          theme_mode: payload.immersive,
+          hardware_accelerated: payload.hw_accel,
+          back_button_handling: payload.back_button,
+          touch_zoom_locked: payload.touch_lock === 'native_lock',
+          status_bar_hex: payload.status_bar_color,
+          anti_theft_guard: payload.anti_inspect,
+          native_js_bridge: payload.js_bridge_enabled,
+          allow_downloads: payload.allow_downloads,
+          keep_screen_on: payload.keep_screen_on
+        },
+        permissions_count: payload.permissions.length,
+        permissions: payload.permissions,
+        android_manifest_xml: manifestXml,
+        icon_source: payload.icon,
+        index_html: finalIndexHtml
+      };
+
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (payload.app_name.replace(/\s+/g, '_').toLowerCase()) + "_v" + payload.version_name + ".json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('Exported & Saved in My APKs!');
+    }
+
+    /* Protected Bundle Importer */
+    function importProtectedBundle(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const bundle = JSON.parse(e.target.result);
+          let rawCode = bundle.index_html || '';
+
+          if (bundle.has_owner_pin) {
+            const enteredPin = prompt("🔒 This project is protected! Enter Owner Master PIN:");
+            if (!enteredPin) {
+              showToast("Import cancelled");
+              return;
+            }
+            try {
+              rawCode = xorDecipher(bundle.protected_source, enteredPin);
+              document.getElementById('cfgOwnerPin').value = enteredPin;
+            } catch(err) {
+              showToast("Invalid Owner PIN! Code locked.");
+              return;
+            }
+          }
+
+          if (bundle.app_name) document.getElementById('appName').value = bundle.app_name;
+          if (bundle.package_name) document.getElementById('pkgName').value = bundle.package_name;
+          
+          document.getElementById('cfgSourceMode').value = bundle.source_mode || 'code';
+          document.getElementById('cfgDesktopMode').value = bundle.is_desktop_mode ? 'true' : 'false';
+          document.getElementById('cfgWebUrl').value = bundle.live_portal_url || '';
+          document.getElementById('sourceCode').value = rawCode;
+          handleExtraModeChange();
+
+          if (bundle.build_config) {
+            const bc = bundle.build_config;
+            if (bc.version_name) document.getElementById('cfgVerName').value = bc.version_name;
+            if (bc.version_code) document.getElementById('cfgVerCode').value = bc.version_code;
+            if (bc.release_keystore_alias) document.getElementById('cfgKeyAlias').value = bc.release_keystore_alias;
+            if (bc.screen_orientation) document.getElementById('cfgOrientation').value = bc.screen_orientation;
+            if (bc.cleartext_traffic !== undefined) document.getElementById('cfgCleartext').value = String(bc.cleartext_traffic);
+            if (bc.theme_mode) document.getElementById('cfgImmersive').value = bc.theme_mode;
+            if (bc.back_button_handling) document.getElementById('cfgBackButton').value = bc.back_button_handling;
+            if (bc.status_bar_hex) document.getElementById('cfgStatusBarColor').value = bc.status_bar_hex;
+            if (bc.native_js_bridge !== undefined) document.getElementById('cfgJsBridge').value = bc.native_js_bridge ? 'enabled' : 'disabled';
+            if (bc.allow_downloads !== undefined) document.getElementById('cfgAllowDownloads').value = String(bc.allow_downloads);
+            if (bc.keep_screen_on !== undefined) document.getElementById('cfgKeepScreenOn').value = bc.keep_screen_on ? 'enabled' : 'disabled';
+            document.getElementById('cfgCodeEncrypt').value = bundle.is_protected ? 'encrypted' : 'plain';
+            updateBuildBadge();
+          }
+
+          if (bundle.permissions && Array.isArray(bundle.permissions)) {
+            const checkboxes = document.querySelectorAll('#permGrid input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+              cb.checked = bundle.permissions.includes(cb.getAttribute('data-perm'));
+            });
+            updatePermBadge();
+          }
+
+          if (bundle.icon_source) {
+            iconBase64 = bundle.icon_source;
+            document.getElementById('iconDisplay').innerHTML = `<img src="${iconBase64}">`;
+            updateDynamicManifest();
+          }
+
+          saveCurrentWork();
+          runCode(false);
+          showToast('Project Unlocked & Loaded!');
+        } catch (err) {
+          showToast('Corrupted or Invalid Bundle File');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    /* Auto-save in-progress state */
+    function saveCurrentWork() {
+      const payload = buildCurrentPayload();
+      localStorage.setItem('dhawan_studio_active_project', JSON.stringify(payload));
+    }
+
+    function restoreCurrentWork() {
+      const raw = localStorage.getItem('dhawan_studio_active_project');
+      if (!raw) return;
+      try {
+        const item = JSON.parse(raw);
+        if (item.app_name) document.getElementById('appName').value = item.app_name;
+        if (item.package_name) document.getElementById('pkgName').value = item.package_name;
+        if (item.code !== undefined) document.getElementById('sourceCode').value = item.code;
+
+        // Restore Extra Features
+        if (item.source_mode) document.getElementById('cfgSourceMode').value = item.source_mode;
+        if (item.desktop_mode !== undefined) document.getElementById('cfgDesktopMode').value = item.desktop_mode ? 'true' : 'false';
+        if (item.web_url) document.getElementById('cfgWebUrl').value = item.web_url;
+        if (item.owner_pin) document.getElementById('cfgOwnerPin').value = item.owner_pin;
+        if (item.code_encrypted !== undefined) document.getElementById('cfgCodeEncrypt').value = item.code_encrypted ? 'encrypted' : 'plain';
+        if (item.anti_inspect !== undefined) document.getElementById('cfgAntiInspect').value = item.anti_inspect ? 'enabled' : 'disabled';
+        if (item.js_bridge_enabled !== undefined) document.getElementById('cfgJsBridge').value = item.js_bridge_enabled ? 'enabled' : 'disabled';
+        if (item.allow_downloads !== undefined) document.getElementById('cfgAllowDownloads').value = item.allow_downloads ? 'true' : 'false';
+        if (item.keep_screen_on !== undefined) document.getElementById('cfgKeepScreenOn').value = item.keep_screen_on ? 'enabled' : 'disabled';
+        handleExtraModeChange();
+
+        // Restore Build Specs
+        if (item.version_name) document.getElementById('cfgVerName').value = item.version_name;
+        if (item.version_code) document.getElementById('cfgVerCode').value = item.version_code;
+        if (item.key_alias) document.getElementById('cfgKeyAlias').value = item.key_alias;
+        if (item.orientation) document.getElementById('cfgOrientation').value = item.orientation;
+        if (item.cleartext !== undefined) document.getElementById('cfgCleartext').value = item.cleartext ? 'true' : 'false';
+        if (item.immersive) document.getElementById('cfgImmersive').value = item.immersive;
+        if (item.hw_accel !== undefined) document.getElementById('cfgHwAccel').value = item.hw_accel ? 'true' : 'false';
+        if (item.back_button) document.getElementById('cfgBackButton').value = item.back_button;
+        if (item.touch_lock) document.getElementById('cfgTouchLock').value = item.touch_lock;
+        if (item.status_bar_color) document.getElementById('cfgStatusBarColor').value = item.status_bar_color;
+
+        if (item.permissions && Array.isArray(item.permissions)) {
+          const checkboxes = document.querySelectorAll('#permGrid input[type="checkbox"]');
+          checkboxes.forEach(cb => {
+            cb.checked = item.permissions.includes(cb.getAttribute('data-perm'));
+          });
+        }
+
+        if (item.icon && item.icon.startsWith('data:image')) {
+          iconBase64 = item.icon;
+          document.getElementById('iconDisplay').innerHTML = `<img src="${iconBase64}">`;
+          updateDynamicManifest();
+        }
+      } catch (e) {
+        console.error("Cache restore error", e);
+      }
+    }
+
+    // Keyboard Shortcuts
+    const editor = document.getElementById('sourceCode');
+    editor.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        runCode(false);
+        return;
+      }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + "  " + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 2;
+        saveCurrentWork();
+      }
+    });
+
+    window.onload = function() {
+      restoreCurrentWork();
+      
+      attachDoubleTapProtection('pkgName', 'Package ID');
+      attachDoubleTapProtection('cfgKeyAlias', 'Keystore Alias');
+
+      updatePermBadge();
+      updateBuildBadge();
+      updateVaultHeaderBadge();
+      updateDynamicManifest();
+      runCode(false);
+    };
+  </script>
+</body>
+</html>
