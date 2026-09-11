@@ -17,88 +17,157 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Set up Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
-      - name: Install Cordova
+      - name: Install Cordova CLI
+        run: npm install -g cordova --no-audit --no-fund
+
+      - name: Prepare Workspace & Process Payload
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PAYLOAD_JSON: ${{ toJson(github.event.client_payload) }}
         run: |
-          npm install -g cordova
+          node -e '
+            const fs = require("fs");
+            const eventName = process.env.EVENT_NAME;
+            let appName = "Dhawan Studio Pro";
+            let pkgName = "com.dhawan.studiopro";
+            let htmlCode = "";
+            let iconB64 = "";
+            let isUserApp = false;
 
-      - name: Build Android APK
+            if (eventName === "repository_dispatch") {
+              try {
+                const payload = JSON.parse(process.env.PAYLOAD_JSON || "{}");
+                appName = payload.app_name || "CustomApp";
+                pkgName = payload.pkg_name || "com.dhawan.customapp";
+                if (payload.html_b64) {
+                  htmlCode = Buffer.from(payload.html_b64, "base64").toString("utf-8");
+                }
+                if (payload.icon_b64) {
+                  iconB64 = payload.icon_b64;
+                }
+                isUserApp = true;
+              } catch(err) {
+                console.error("Payload extraction failure:", err);
+                process.exit(1);
+              }
+            }
+
+            fs.writeFileSync("build_env.env", 
+              `IS_USER_APP=${isUserApp}\nAPP_NAME=${appName}\nPKG_NAME=${pkgName}\n`
+            );
+
+            if (htmlCode) {
+              fs.writeFileSync("user_index.html", htmlCode);
+            }
+            if (iconB64) {
+              fs.writeFileSync("user_icon.b64", iconB64);
+            }
+          '
+          cat build_env.env >> $GITHUB_ENV
+
+      - name: Compile Native Android Application
         run: |
-          # 1. Check if user built app or master app
-          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
-            APP_NAME="${{ github.event.client_payload.app_name }}"
-            PKG_NAME="${{ github.event.client_payload.pkg_name }}"
-            HTML_B64="${{ github.event.client_payload.html_b64 }}"
-            OUT_APK="DhawanCustomApp.apk"
-            REL_TAG="user-app-build"
-            REL_NAME="User Generated App"
-          else
-            APP_NAME="Dhawan Studio Pro"
-            PKG_NAME="com.dhawan.studiopro"
-            HTML_B64=""
-            OUT_APK="DhawanStudioPro.apk"
-            REL_TAG="latest-build"
-            REL_NAME="Dhawan Studio Pro Master App"
-          fi
+          set -e
+          echo "Target Assembly: $APP_NAME ($PKG_NAME)"
 
-          [ -z "$APP_NAME" ] && APP_NAME="Dhawan Studio Pro"
-          [ -z "$PKG_NAME" ] && PKG_NAME="com.dhawan.studiopro"
+          cordova create appdir "$PKG_NAME" "$APP_NAME"
+          cd appdir
 
-          # 2. Setup Project
-          cordova create myapp "$PKG_NAME" "$APP_NAME"
-          cd myapp
-
-          # Version code taaki har baar phone UPDATE bole
+          # Unified Auto-Versioning for seamless in-place updates
           TIMESTAMP_VC=$(date +%s | cut -c 3-10)
           sed -i "s/<widget /<widget android-versionCode=\"$TIMESTAMP_VC\" /g" config.xml
 
-          # Zero splash preferences
-          sed -i '/<\/widget>/i \    <preference name="SplashScreenDelay" value="0" />\n    <preference name="AutoHideSplashScreen" value="true" />\n    <preference name="ShowSplashScreen" value="false" />\n    <preference name="FadeSplashScreen" value="false" />' config.xml
+          # Enforce Native Zero Splash Screen Preferences
+          sed -i '/<\/widget>/i \    <preference name="SplashScreenDelay" value="0" />\n    <preference name="AutoHideSplashScreen" value="true" />\n    <preference name="ShowSplashScreen" value="false" />\n    <preference name="FadeSplashScreen" value="false" />\n    <preference name="BackgroundColor" value="0xff000000" />\n    <preference name="AndroidWindowSplashScreenBackground" value="#000000" />' config.xml
 
-          # Copy App Code
+          # Replace HTML content
           rm -rf www/*
-          if [ -n "$HTML_B64" ]; then
-            echo "$HTML_B64" | base64 -d > www/index.html
+          if [ -f ../user_index.html ]; then
+            cp ../user_index.html www/index.html
           elif [ -f ../index.html ]; then
             cp ../index.html www/index.html
           fi
 
-          # Copy Icon if exists
-          if [ -f ../icon.jpg ]; then
-            mkdir -p res
+          # Asset Management & Transparent Vector Generation for Android 12+
+          mkdir -p res
+          cat <<'EOF' > res/ic_transparent.xml
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="1dp"
+              android:height="1dp"
+              android:viewportWidth="1"
+              android:viewportHeight="1">
+          </vector>
+          EOF
+
+          if [ -f ../user_icon.b64 ]; then
+            sed 's/^data:image\/[a-z]*;base64,//' ../user_icon.b64 | base64 -d > res/icon.png 2>/dev/null || true
+          elif [ -f ../icon.jpg ]; then
             cp ../icon.jpg res/icon.png
+          fi
+
+          if [ -f res/icon.png ]; then
             sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon.png" />\n    </platform>' config.xml
           fi
 
-          # 3. Add Android Platform
-          cordova platform add android
+          # Add Android Platform
+          cordova platform add android --no-telemetry
 
-          # 4. Standard Consistent Debug Build (Never causes signature conflicts)
-          cordova build android --debug
+          # Override Android 12+ Window Splash Styles
+          STYLE_DIR="platforms/android/app/src/main/res/values"
+          if [ -d "$STYLE_DIR" ]; then
+            mkdir -p platforms/android/app/src/main/res/drawable
+            cp res/ic_transparent.xml platforms/android/app/src/main/res/drawable/ic_transparent.xml
+            for sfile in "$STYLE_DIR"/themes.xml "$STYLE_DIR"/styles.xml; do
+              if [ -f "$sfile" ]; then
+                sed -i '/<item name="windowSplashScreenAnimatedIcon">/d' "$sfile" 2>/dev/null || true
+                sed -i '/<\/style>/i \        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_transparent</item>\n        <item name="android:windowSplashScreenBackground">#000000</item>' "$sfile" 2>/dev/null || true
+              fi
+            done
+          fi
 
-          cp platforms/android/app/build/outputs/apk/debug/app-debug.apk "../$OUT_APK"
-          echo "OUT_APK=$OUT_APK" >> $GITHUB_ENV
-          echo "REL_TAG=$REL_TAG" >> $GITHUB_ENV
-          echo "REL_NAME=$REL_NAME" >> $GITHUB_ENV
+          # Overwrite default Cordova branding images
+          if [ -f res/icon.png ]; then
+            find platforms/android/ -type f \( -name "*splash*.png" -o -name "*screen*.png" \) -exec cp res/icon.png {} \; 2>/dev/null || true
+          fi
 
-      - name: Publish Release APK
+          # Enforce Reusable Signing Configuration
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+          cordova build android --debug --no-telemetry
+
+          # Route Release Artifacts
+          if [ "$IS_USER_APP" = "true" ]; then
+            cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../DhawanCustomApp.apk
+            echo "RELEASE_FILE=DhawanCustomApp.apk" >> $GITHUB_ENV
+            echo "RELEASE_TAG=user-app-build" >> $GITHUB_ENV
+            echo "RELEASE_NAME=User Generated App" >> $GITHUB_ENV
+          else
+            cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../DhawanStudioPro.apk
+            echo "RELEASE_FILE=DhawanStudioPro.apk" >> $GITHUB_ENV
+            echo "RELEASE_TAG=latest-build" >> $GITHUB_ENV
+            echo "RELEASE_NAME=Dhawan Studio Pro Master App" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy Direct APK Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.REL_TAG }}
-          name: ${{ env.REL_NAME }}
-          files: ${{ env.OUT_APK }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_NAME }}
+          files: ${{ env.RELEASE_FILE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
