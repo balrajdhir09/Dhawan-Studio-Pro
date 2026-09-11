@@ -1,9 +1,14 @@
-name: Build Android APK
+name: Dhawan Studio Pro Cloud APK Factory
 
 on:
   push:
     branches: [ main ]
+  repository_dispatch:
+    types: [ build_user_app ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -32,34 +37,60 @@ jobs:
           sudo apt-get install -y imagemagick
           npm install -g cordova
 
-      - name: Build Cordova Project
+      - name: Setup Project & Zero-Delay Splash Screen
         run: |
-          # 1. Project create
-          cordova create myapp com.dhawan.studiopro "Dhawan Studio Pro"
+          # 1. Payload Data Check
+          APP_NAME="${{ github.event.client_payload.app_name }}"
+          PKG_NAME="${{ github.event.client_payload.pkg_name }}"
+          SOURCE_HTML="${{ github.event.client_payload.html_code }}"
+          ICON_BASE64="${{ github.event.client_payload.icon_base64 }}"
+
+          [ -z "$APP_NAME" ] && APP_NAME="Dhawan Studio Pro"
+          [ -z "$PKG_NAME" ] && PKG_NAME="com.dhawan.studiopro"
+
+          # 2. Create Cordova Project
+          cordova create myapp "$PKG_NAME" "$APP_NAME"
           cd myapp
 
-          # 2. Copy source code
+          # 3. Dynamic Version Code & Pure Zero Splash Screen Preferences
+          TIMESTAMP_VC=$(date +%s | cut -c 3-10)
+          sed -i "s/<widget /<widget android-versionCode=\"$TIMESTAMP_VC\" /g" config.xml
+          sed -i '/<\/widget>/i \    <preference name="SplashScreenDelay" value="0" />\n    <preference name="AutoHideSplashScreen" value="true" />\n    <preference name="ShowSplashScreen" value="false" />\n    <preference name="FadeSplashScreen" value="false" />' config.xml
+
+          # 4. Copy Code
           rm -rf www/*
-          if [ -f ../index.html ]; then
+          if [ -n "$SOURCE_HTML" ]; then
+            echo "$SOURCE_HTML" > www/index.html
+          elif [ -f ../index.html ]; then
             cp ../index.html www/index.html
           fi
 
-          # 3. Clean icon injection via config.xml (Official Cordova Way)
-          if [ -f ../icon.jpg ]; then
-            echo "Processing icon.jpg..."
-            convert ../icon.jpg -resize 512x512 icon_app.png
-            # Inject into config.xml so cordova handles all mipmaps automatically
-            sed -i '/<\/widget>/i \    <icon src="icon_app.png" />' config.xml
+          # 5. Native Icon Injection
+          mkdir -p res
+          if [ -n "$ICON_BASE64" ]; then
+            echo "$ICON_BASE64" | sed 's/^data:image\/[a-z]*;base64,//' | base64 -d > res/icon_raw.png
+            convert res/icon_raw.png -resize 512x512 res/icon.png
+          elif [ -f ../icon.jpg ]; then
+            convert ../icon.jpg -resize 512x512 res/icon.png
           fi
 
-          # 4. Add Android Platform
-          cordova platform add android
+          if [ -f res/icon.png ]; then
+            sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon.png" density="ldpi" />\n        <icon src="res/icon.png" density="mdpi" />\n        <icon src="res/icon.png" density="hdpi" />\n        <icon src="res/icon.png" density="xhdpi" />\n        <icon src="res/icon.png" density="xxhdpi" />\n        <icon src="res/icon.png" density="xxxhdpi" />\n    </platform>' config.xml
+          fi
 
-          # 5. Build APK
+          # 6. Build APK
+          cordova platform add android
           cordova build android --debug
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+          # Move APK for release
+          cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../DhawanStudioPro.apk
+
+      - name: Publish Direct Release APK
+        uses: softprops/action-gh-release@v2
         with:
-          name: Dhawan-Studio-Pro-APK
-          path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+          tag_name: latest-build
+          name: Dhawan Studio Pro (Direct APK)
+          body: "Auto-compiled standalone APK by Dhawan Studio Pro Engine."
+          files: DhawanStudioPro.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
