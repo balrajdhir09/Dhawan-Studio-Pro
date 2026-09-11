@@ -120,13 +120,12 @@ jobs:
             echo "<h1 style='text-align:center;margin-top:50vh;'>Dhawan Studio Pro Ready</h1>" > my-app/app/src/main/assets/www/index.html
           fi
 
-      - name: Build APK with Gradle
+      - name: Build APK Direct
         run: |
           cd my-app
           export ANDROID_HOME=$ANDROID_SDK_ROOT
-          yes | sdkmanager --licenses || true
-          gradle wrapper --gradle-version 7.5
-          ./gradlew assembleDebug
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          gradle assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
