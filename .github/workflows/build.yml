@@ -31,41 +31,81 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Cordova & ImageMagick
+      - name: Install Cordova & Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
           npm install -g cordova
 
-      - name: Setup Project & Build With Persistent Signature
+      - name: Prepare Payload & Project Code
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PAYLOAD_JSON: ${{ toJson(github.event.client_payload) }}
         run: |
-          APP_NAME="${{ github.event.client_payload.app_name }}"
-          PKG_NAME="${{ github.event.client_payload.pkg_name }}"
-          SOURCE_HTML="${{ github.event.client_payload.html_code }}"
-          ICON_BASE64="${{ github.event.client_payload.icon_base64 }}"
+          node -e '
+            const fs = require("fs");
+            const eventName = process.env.EVENT_NAME;
+            let appName = "Dhawan Studio Pro";
+            let pkgName = "com.dhawan.studiopro";
+            let htmlCode = "";
+            let iconB64 = "";
+            let isUserApp = false;
 
-          [ -z "$APP_NAME" ] && APP_NAME="Dhawan Studio Pro"
-          [ -z "$PKG_NAME" ] && PKG_NAME="com.dhawan.studiopro"
+            if (eventName === "repository_dispatch") {
+              try {
+                const payload = JSON.parse(process.env.PAYLOAD_JSON || "{}");
+                if (payload.app_name) appName = payload.app_name;
+                if (payload.pkg_name) pkgName = payload.pkg_name;
+                if (payload.html_code) htmlCode = payload.html_code;
+                if (payload.html_b64) htmlCode = Buffer.from(payload.html_b64, "base64").toString("utf-8");
+                if (payload.icon_base64) iconB64 = payload.icon_base64;
+                if (payload.icon_b64) iconB64 = payload.icon_b64;
+                isUserApp = true;
+              } catch(e) {
+                console.error("Payload parse error:", e);
+              }
+            }
+
+            fs.writeFileSync("build_vars.env", 
+              `IS_USER_APP=${isUserApp}\nAPP_NAME=${appName}\nPKG_NAME=${pkgName}\n`
+            );
+
+            if (htmlCode) {
+              fs.writeFileSync("injected_index.html", htmlCode);
+            }
+            if (iconB64) {
+              fs.writeFileSync("injected_icon.b64", iconB64);
+            }
+          '
+          cat build_vars.env >> $GITHUB_ENV
+
+      - name: Build Cordova Android APK (Destroy All Default Splash Logos)
+        run: |
+          echo "Building: $APP_NAME ($PKG_NAME)"
 
           cordova create myapp "$PKG_NAME" "$APP_NAME"
           cd myapp
 
-          # Timestamp Version Code
+          # Timestamp Versioning
           TIMESTAMP_VC=$(date +%s | cut -c 3-10)
           sed -i "s/<widget /<widget android-versionCode=\"$TIMESTAMP_VC\" /g" config.xml
-          sed -i '/<\/widget>/i \    <preference name="SplashScreenDelay" value="0" />\n    <preference name="AutoHideSplashScreen" value="true" />\n    <preference name="ShowSplashScreen" value="false" />\n    <preference name="FadeSplashScreen" value="false" />' config.xml
 
+          # Kill Cordova Splash completely in config.xml
+          sed -i '/<\/widget>/i \    <preference name="SplashScreenDelay" value="0" />\n    <preference name="AutoHideSplashScreen" value="true" />\n    <preference name="ShowSplashScreen" value="false" />\n    <preference name="FadeSplashScreen" value="false" />\n    <preference name="SplashMaintainAspectRatio" value="false" />\n    <preference name="SplashShowOnlyFirstTime" value="false" />' config.xml
+
+          # Inject user HTML
           rm -rf www/*
-          if [ -n "$SOURCE_HTML" ]; then
-            echo "$SOURCE_HTML" > www/index.html
+          if [ -f ../injected_index.html ]; then
+            cp ../injected_index.html www/index.html
           elif [ -f ../index.html ]; then
             cp ../index.html www/index.html
           fi
 
+          # Inject Icon
           mkdir -p res
-          if [ -n "$ICON_BASE64" ]; then
-            echo "$ICON_BASE64" | sed 's/^data:image\/[a-z]*;base64,//' | base64 -d > res/icon_raw.png
-            convert res/icon_raw.png -resize 512x512 res/icon.png
+          if [ -f ../injected_icon.b64 ]; then
+            sed 's/^data:image\/[a-z]*;base64,//' ../injected_icon.b64 | base64 -d > res/icon_raw.png 2>/dev/null || true
+            convert res/icon_raw.png -resize 512x512 res/icon.png 2>/dev/null || true
           elif [ -f ../icon.jpg ]; then
             convert ../icon.jpg -resize 512x512 res/icon.png
           fi
@@ -74,7 +114,7 @@ jobs:
             sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon.png" density="ldpi" />\n        <icon src="res/icon.png" density="mdpi" />\n        <icon src="res/icon.png" density="hdpi" />\n        <icon src="res/icon.png" density="xhdpi" />\n        <icon src="res/icon.png" density="xxhdpi" />\n        <icon src="res/icon.png" density="xxxhdpi" />\n    </platform>' config.xml
           fi
 
-          # Persistent Signing Key (Prevents "package conflicts" error forever)
+          # Keystore setup
           keytool -genkey -v -keystore persistent.keystore -alias dhawankey -keyalg RSA -keysize 2048 -validity 10000 -storepass dhawan123 -keypass dhawan123 -dname "CN=Dhawan, OU=Studio, O=Dhawan, L=Ludhiana, S=PB, C=IN"
 
           cat <<EOF > build.json
@@ -91,17 +131,36 @@ jobs:
           }
           EOF
 
+          # Prepare Android Platform
           cordova platform add android
+
+          # WIPE OUT CORDOVA DEFAULT SPLASH IMAGES COMPLETELY
+          # Yeh saare default cordova/robot/splash logos ko 1x1 transparent/black me badal dega
+          convert -size 1x1 xc:black res/blank_splash.png
+          find platforms/android/app/src/main/res/ -type f \( -name "*splash*.png" -o -name "*screen*.png" \) -exec cp res/blank_splash.png {} \;
+
+          # Compile Android APK
           cordova build android --debug --buildConfig=build.json
 
-          cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../DhawanStudioPro.apk
+          # Output Management
+          if [ "$IS_USER_APP" = "true" ]; then
+            cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../DhawanCustomApp.apk
+            echo "OUT_FILE=DhawanCustomApp.apk" >> $GITHUB_ENV
+            echo "OUT_TAG=user-app-build" >> $GITHUB_ENV
+            echo "OUT_TITLE=User Custom Generated App" >> $GITHUB_ENV
+          else
+            cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../DhawanStudioPro.apk
+            echo "OUT_FILE=DhawanStudioPro.apk" >> $GITHUB_ENV
+            echo "OUT_TAG=latest-build" >> $GITHUB_ENV
+            echo "OUT_TITLE=Dhawan Studio Pro Master App" >> $GITHUB_ENV
+          fi
 
       - name: Publish Direct Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest-build
-          name: Dhawan Studio Pro (Direct APK)
-          body: "Official direct APK build generated by Dhawan Studio Pro Engine."
-          files: DhawanStudioPro.apk
+          tag_name: ${{ env.OUT_TAG }}
+          name: ${{ env.OUT_TITLE }}
+          body: "Direct zero-splash APK build by Dhawan Studio Pro."
+          files: ${{ env.OUT_FILE }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
