@@ -346,12 +346,12 @@
 
       <label>
         New App Name
-        <input type="text" id="appName" value="My Billing App" oninput="autoSyncPackageID()">
+        <input type="text" id="appName" value="Squid Pay" oninput="autoSyncPackageID()">
       </label>
 
       <label>
         New App Package ID
-        <input type="text" id="pkgName" value="com.dhawan.mybillingapp">
+        <input type="text" id="pkgName" value="com.dhawan.squidpay">
       </label>
 
       <div class="icon-box">
@@ -360,7 +360,7 @@
         </div>
         <label style="flex: 1;">
           New App Icon (.jpg / .png)
-          <input type="file" id="iconInput" accept="image/*" onchange="loadIcon(event)" style="font-size: 11px; padding: 2px; color: #aaa;">
+          <input type="file" id="iconInput" accept="image/*" onchange="loadAndCompressIcon(event)" style="font-size: 11px; padding: 2px; color: #aaa;">
         </label>
       </div>
 
@@ -457,6 +457,30 @@
       showToast('Token Saved!');
     }
 
+    // Auto-compress heavy icon to tiny size (Fixes 422 Payload Too Large forever)
+    function loadAndCompressIcon(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = 128;
+          canvas.height = 128;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, 128, 128);
+          // Compress to lightweight JPEG (under 10 KB)
+          customIconBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          document.getElementById('iconDisplay').innerHTML = `<img src="${customIconBase64}">`;
+          showToast('Icon Ready & Compressed!');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     async function triggerCloudAPKBuild() {
       const token = localStorage.getItem('dhawan_gh_token');
       if (!token) {
@@ -466,8 +490,8 @@
       }
 
       const code = document.getElementById('sourceCode').value.trim();
-      const appName = document.getElementById('appName').value.trim() || 'My App';
-      let pkgName = document.getElementById('pkgName').value.trim() || 'com.dhawan.app';
+      const appName = document.getElementById('appName').value.trim() || 'Squid Pay';
+      let pkgName = document.getElementById('pkgName').value.trim() || 'com.dhawan.squidpay';
 
       if (pkgName === 'com.dhawan.studiopro') {
         pkgName = 'com.dhawan.' + appName.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -524,7 +548,7 @@
     }
 
     function downloadUserAppAPK() {
-      const name = document.getElementById('appName').value.trim() || 'My_App';
+      const name = document.getElementById('appName').value.trim() || 'Squid_Pay';
       showToast(`Downloading ${name}.apk...`);
       const url = 'https://github.com/balrajdhir09/Dhawan-Studio-Pro/releases/download/user-app-build/DhawanCustomApp.apk';
       const a = document.createElement('a');
@@ -543,7 +567,7 @@
 
     function saveToVaultAndStorage() {
       const code = document.getElementById('sourceCode').value.trim();
-      const name = document.getElementById('appName').value.trim() || 'MyApp';
+      const name = document.getElementById('appName').value.trim() || 'Squid Pay';
       if (!code) { showToast('Pehle code likhein!'); return; }
 
       let vault = getVault();
@@ -608,18 +632,6 @@
       updateVaultBadge();
       openVaultModal();
       showToast('Deleted');
-    }
-
-    function loadIcon(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        customIconBase64 = e.target.result;
-        document.getElementById('iconDisplay').innerHTML = `<img src="${customIconBase64}">`;
-        showToast('Icon Ready!');
-      };
-      reader.readAsDataURL(file);
     }
 
     function runCode(scroll) {
