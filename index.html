@@ -6,7 +6,6 @@
   <title>Dhawan Studio Pro</title>
   <meta name="theme-color" content="#000000">
 
-  <!-- Anti-Cache Headers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -36,7 +35,6 @@
       scroll-behavior: smooth;
     }
 
-    /* Header */
     header {
       position: sticky;
       top: 0;
@@ -144,19 +142,6 @@
       font-family: ui-monospace, monospace; 
       font-size: 12.5px; 
       resize: vertical; 
-    }
-
-    .locked-input {
-      cursor: not-allowed;
-      border-style: dashed !important;
-      color: #aaa !important;
-      background: #040101 !important;
-    }
-    .locked-input:not([readonly]) {
-      cursor: text !important;
-      border-style: solid !important;
-      color: #fff !important;
-      border-color: var(--blood-bright) !important;
     }
 
     .icon-box {
@@ -360,13 +345,13 @@
       </div>
 
       <label>
-        App Name
-        <input type="text" id="appName" value="My Project" oninput="handleInputSync()">
+        New App Name
+        <input type="text" id="appName" value="My Billing App" oninput="autoSyncPackageID()">
       </label>
 
       <label>
-        Package Identifier <span style="font-size:9.5px; color:#ff6666;">[🔒 Double-tap to edit]</span>
-        <input type="text" id="pkgName" class="locked-input" value="com.dhawan.myproject" readonly>
+        New App Package ID
+        <input type="text" id="pkgName" value="com.dhawan.mybillingapp">
       </label>
 
       <div class="icon-box">
@@ -374,7 +359,7 @@
           <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         </div>
         <label style="flex: 1;">
-          Change App Icon (.jpg / .png)
+          New App Icon (.jpg / .png)
           <input type="file" id="iconInput" accept="image/*" onchange="loadIcon(event)" style="font-size: 11px; padding: 2px; color: #aaa;">
         </label>
       </div>
@@ -388,7 +373,7 @@
       <div class="btn-row">
         <button class="action-btn" onclick="runCode(true)">👁 Render</button>
         <button class="action-btn" onclick="saveToVaultAndStorage()">💾 Save App</button>
-        <button class="action-btn" onclick="downloadLatestAPKDirect()">⬇️ Download APK</button>
+        <button class="action-btn" onclick="downloadUserAppAPK()">⬇️ Download APK</button>
       </div>
     </div>
 
@@ -421,7 +406,7 @@
           <input type="text" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxx">
         </label>
         <div style="font-size: 11px; color: #aaa; line-height: 1.4;">
-          Yeh token Dhawan Studio Pro ko aapke GitHub server par direct APK compile karne ka order deta hai. Yeh aapke browser memory me 100% safe save rahega.
+          Yeh token Dhawan Studio Pro ko GitHub par direct APK compile karne ka order deta hai.
         </div>
       </div>
       <div class="modal-footer">
@@ -451,58 +436,48 @@
       const t = document.getElementById('toast');
       t.innerText = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2600);
+      setTimeout(() => t.classList.remove('show'), 3500);
     }
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    function handleInputSync() {
+    function autoSyncPackageID() {
       const name = document.getElementById('appName').value.trim();
       const sanitized = name.toLowerCase().replace(/[^a-z0-9]/g, '');
       document.getElementById('pkgName').value = 'com.dhawan.' + (sanitized || 'app');
     }
 
-    function attachDoubleTap(id) {
-      const el = document.getElementById(id);
-      let last = 0;
-      el.addEventListener('touchend', () => {
-        let now = Date.now();
-        if (now - last < 350) { el.removeAttribute('readonly'); el.focus(); showToast('Unlocked'); }
-        last = now;
-      });
-      el.addEventListener('dblclick', () => { el.removeAttribute('readonly'); el.focus(); showToast('Unlocked'); });
-      el.addEventListener('blur', () => { el.setAttribute('readonly', 'true'); });
-    }
-
     function saveGithubToken() {
-      const tok = document.getElementById('ghTokenInput').value.trim();
+      let tok = document.getElementById('ghTokenInput').value.trim();
+      tok = tok.replace(/["']/g, '');
       if (!tok) { showToast('Token paste karein!'); return; }
       localStorage.setItem('dhawan_gh_token', tok);
       closeModal('tokenModal');
-      showToast('Factory Token Linked Successfully!');
+      showToast('Token Saved!');
     }
 
-    // CLOUD APK TRIGGER PIPELINE
     async function triggerCloudAPKBuild() {
       const token = localStorage.getItem('dhawan_gh_token');
       if (!token) {
-        showToast('Pehle upar "🔑 Factory Token" me apna token save karein!');
+        showToast('Pehle "🔑 Factory Token" me apna token save karein!');
         openModal('tokenModal');
         return;
       }
 
       const code = document.getElementById('sourceCode').value.trim();
       const appName = document.getElementById('appName').value.trim() || 'My App';
-      const pkgName = document.getElementById('pkgName').value.trim() || 'com.dhawan.app';
+      let pkgName = document.getElementById('pkgName').value.trim() || 'com.dhawan.app';
 
-      if (!code) {
-        showToast('Source code khali hai!');
-        return;
+      if (pkgName === 'com.dhawan.studiopro') {
+        pkgName = 'com.dhawan.' + appName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        document.getElementById('pkgName').value = pkgName;
       }
 
+      if (!code) { showToast('Source code box khali hai!'); return; }
+
       const btn = document.getElementById('buildBtn');
-      btn.innerText = '⚙ Sending to Cloud Compiler...';
+      btn.innerText = '⚙ Sending to Cloud...';
       btn.style.opacity = '0.7';
 
       try {
@@ -511,8 +486,8 @@
           client_payload: {
             app_name: appName,
             pkg_name: pkgName,
-            html_code: code,
-            icon_base64: customIconBase64 || ''
+            html_b64: btoa(unescape(encodeURIComponent(code))),
+            icon_b64: customIconBase64 || ''
           }
         };
 
@@ -520,43 +495,47 @@
           method: 'POST',
           headers: {
             'Accept': 'application/vnd.github.v3+json',
-            'Authorization': 'token ' + token,
+            'Authorization': 'token ' + token.trim(),
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(payload)
         });
 
         if (res.status === 204) {
-          showToast('🚀 Build Start ho gayi hai! 50 second wait karein...');
-          btn.innerText = '⏳ Compiling APK (Takes ~50s)...';
+          showToast(`🚀 "${appName}" build shuru! ~55 sec wait karein...`);
+          btn.innerText = '⏳ Compiling APK (~55s)...';
           setTimeout(() => {
             btn.innerText = '⬇️ APK Ready! Tap "Download APK"';
             btn.style.opacity = '1';
+            showToast('APK ban gayi! Niche "Download APK" dabayein.');
           }, 55000);
         } else {
-          showToast('Error: Token check karein');
+          const errData = await res.json().catch(() => ({}));
+          const msg = errData.message || res.statusText || 'Error';
+          showToast(`GitHub Code ${res.status}: ${msg}`);
           btn.innerText = '⚡ BUILD NATIVE APK';
           btn.style.opacity = '1';
         }
       } catch(e) {
-        showToast('Network error');
+        showToast('Error: ' + e.message);
         btn.innerText = '⚡ BUILD NATIVE APK';
         btn.style.opacity = '1';
       }
     }
 
-    function downloadLatestAPKDirect() {
-      showToast('Downloading compiled APK...');
-      const url = 'https://github.com/balrajdhir09/Dhawan-Studio-Pro/releases/download/latest-build/DhawanStudioPro.apk';
+    function downloadUserAppAPK() {
+      const name = document.getElementById('appName').value.trim() || 'My_App';
+      showToast(`Downloading ${name}.apk...`);
+      const url = 'https://github.com/balrajdhir09/Dhawan-Studio-Pro/releases/download/user-app-build/DhawanCustomApp.apk';
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'DhawanStudioPro.apk';
+      a.download = name.replace(/\s+/g, '_') + '.apk';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
     }
 
-    /* VAULT ENGINE */
+    /* VAULT */
     function getVault() {
       try { return JSON.parse(localStorage.getItem('dhawan_vault_projects') || '[]'); }
       catch(e) { return []; }
@@ -565,8 +544,7 @@
     function saveToVaultAndStorage() {
       const code = document.getElementById('sourceCode').value.trim();
       const name = document.getElementById('appName').value.trim() || 'MyApp';
-
-      if (!code) { showToast('Pehle source code box me code likhein!'); return; }
+      if (!code) { showToast('Pehle code likhein!'); return; }
 
       let vault = getVault();
       vault.unshift({
@@ -617,6 +595,7 @@
       if (item) {
         document.getElementById('appName').value = item.name;
         document.getElementById('sourceCode').value = item.code;
+        autoSyncPackageID();
         runCode(false);
         closeModal('vaultModal');
         showToast('Loaded: ' + item.name);
@@ -628,7 +607,7 @@
       localStorage.setItem('dhawan_vault_projects', JSON.stringify(v));
       updateVaultBadge();
       openVaultModal();
-      showToast('Project deleted');
+      showToast('Deleted');
     }
 
     function loadIcon(event) {
@@ -638,7 +617,7 @@
       reader.onload = function(e) {
         customIconBase64 = e.target.result;
         document.getElementById('iconDisplay').innerHTML = `<img src="${customIconBase64}">`;
-        showToast('Custom Icon Loaded!');
+        showToast('Icon Ready!');
       };
       reader.readAsDataURL(file);
     }
@@ -652,7 +631,6 @@
     }
 
     window.onload = function() {
-      attachDoubleTap('pkgName');
       updateVaultBadge();
       const savedTok = localStorage.getItem('dhawan_gh_token');
       if (savedTok) document.getElementById('ghTokenInput').value = savedTok;
