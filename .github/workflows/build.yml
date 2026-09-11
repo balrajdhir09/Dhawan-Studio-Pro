@@ -21,10 +21,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Create Dummy Android Project
+      - name: Create Clean Android Project
         run: |
           mkdir -p my-app/app/src/main/assets/www
           cd my-app
+          
           cat << 'EOF' > build.gradle
           buildscript {
               repositories {
@@ -32,7 +33,7 @@ jobs:
                   mavenCentral()
               }
               dependencies {
-                  classpath 'com.android.tools.build:gradle:8.1.0'
+                  classpath 'com.android.tools.build:gradle:7.4.2'
               }
           }
           allprojects {
@@ -55,11 +56,11 @@ jobs:
           }
           android {
               namespace 'com.dhawan.studiopro'
-              compileSdk 34
+              compileSdk 33
               defaultConfig {
                   applicationId "com.dhawan.studiopro"
                   minSdk 21
-                  targetSdk 34
+                  targetSdk 33
                   versionCode 1
                   versionName "1.0.0"
               }
@@ -122,12 +123,13 @@ jobs:
       - name: Build APK with Gradle
         run: |
           cd my-app
-          chmod +x gradlew || true
-          ./gradlew assembleDebug || gradle assembleDebug
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          yes | sdkmanager --licenses || true
+          gradle wrapper --gradle-version 7.5
+          ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: my-app/app/build/outputs/apk/debug/app-debug.apk
-          
