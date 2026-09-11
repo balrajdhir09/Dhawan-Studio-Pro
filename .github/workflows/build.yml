@@ -27,12 +27,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install Cordova CLI
         run: npm install -g cordova --no-audit --no-fund
 
-      - name: Prepare Workspace & Process Payload
+      - name: Prepare Payload
         env:
           EVENT_NAME: ${{ github.event_name }}
           PAYLOAD_JSON: ${{ toJson(github.event.client_payload) }}
@@ -59,8 +58,7 @@ jobs:
                 }
                 isUserApp = true;
               } catch(err) {
-                console.error("Payload extraction failure:", err);
-                process.exit(1);
+                console.error("Payload error:", err);
               }
             }
 
@@ -68,31 +66,22 @@ jobs:
               `IS_USER_APP=${isUserApp}\nAPP_NAME=${appName}\nPKG_NAME=${pkgName}\n`
             );
 
-            if (htmlCode) {
-              fs.writeFileSync("user_index.html", htmlCode);
-            }
-            if (iconB64) {
-              fs.writeFileSync("user_icon.b64", iconB64);
-            }
+            if (htmlCode) fs.writeFileSync("user_index.html", htmlCode);
+            if (iconB64) fs.writeFileSync("user_icon.b64", iconB64);
           '
           cat build_env.env >> $GITHUB_ENV
 
-      - name: Compile Native Android Application
+      - name: Build Cordova Project
         run: |
           set -e
-          echo "Target Assembly: $APP_NAME ($PKG_NAME)"
-
           cordova create appdir "$PKG_NAME" "$APP_NAME"
           cd appdir
 
-          # Unified Auto-Versioning for seamless in-place updates
           TIMESTAMP_VC=$(date +%s | cut -c 3-10)
           sed -i "s/<widget /<widget android-versionCode=\"$TIMESTAMP_VC\" /g" config.xml
 
-          # Enforce Native Zero Splash Screen Preferences
           sed -i '/<\/widget>/i \    <preference name="SplashScreenDelay" value="0" />\n    <preference name="AutoHideSplashScreen" value="true" />\n    <preference name="ShowSplashScreen" value="false" />\n    <preference name="FadeSplashScreen" value="false" />\n    <preference name="BackgroundColor" value="0xff000000" />\n    <preference name="AndroidWindowSplashScreenBackground" value="#000000" />' config.xml
 
-          # Replace HTML content
           rm -rf www/*
           if [ -f ../user_index.html ]; then
             cp ../user_index.html www/index.html
@@ -100,7 +89,6 @@ jobs:
             cp ../index.html www/index.html
           fi
 
-          # Asset Management & Transparent Vector Generation for Android 12+
           mkdir -p res
           cat <<'EOF' > res/ic_transparent.xml
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -121,10 +109,8 @@ jobs:
             sed -i '/<\/widget>/i \    <platform name="android">\n        <icon src="res/icon.png" />\n    </platform>' config.xml
           fi
 
-          # Add Android Platform
           cordova platform add android --no-telemetry
 
-          # Override Android 12+ Window Splash Styles
           STYLE_DIR="platforms/android/app/src/main/res/values"
           if [ -d "$STYLE_DIR" ]; then
             mkdir -p platforms/android/app/src/main/res/drawable
@@ -137,12 +123,10 @@ jobs:
             done
           fi
 
-          # Overwrite default Cordova branding images
           if [ -f res/icon.png ]; then
             find platforms/android/ -type f \( -name "*splash*.png" -o -name "*screen*.png" \) -exec cp res/icon.png {} \; 2>/dev/null || true
           fi
 
-          # Enforce Reusable Signing Configuration
           mkdir -p ~/.android
           if [ ! -f ~/.android/debug.keystore ]; then
             keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
@@ -150,7 +134,6 @@ jobs:
 
           cordova build android --debug --no-telemetry
 
-          # Route Release Artifacts
           if [ "$IS_USER_APP" = "true" ]; then
             cp platforms/android/app/build/outputs/apk/debug/app-debug.apk ../DhawanCustomApp.apk
             echo "RELEASE_FILE=DhawanCustomApp.apk" >> $GITHUB_ENV
