@@ -1,0 +1,133 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create Dummy Android Project
+        run: |
+          mkdir -p my-app/app/src/main/assets/www
+          cd my-app
+          cat << 'EOF' > build.gradle
+          buildscript {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+              dependencies {
+                  classpath 'com.android.tools.build:gradle:8.1.0'
+              }
+          }
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          EOF
+
+          cat << 'EOF' > settings.gradle
+          rootProject.name = "DhawanApp"
+          include ':app'
+          EOF
+
+          mkdir -p app
+          cat << 'EOF' > app/build.gradle
+          plugins {
+              id 'com.android.application'
+          }
+          android {
+              namespace 'com.dhawan.studiopro'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.dhawan.studiopro"
+                  minSdk 21
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0.0"
+              }
+          }
+          dependencies {
+              implementation 'androidx.appcompat:appcompat:1.6.1'
+          }
+          EOF
+
+          mkdir -p app/src/main
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+              package="com.dhawan.studiopro">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <application
+                  android:label="Dhawan Studio Pro"
+                  android:usesCleartextTraffic="true">
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          mkdir -p app/src/main/java/com/dhawan/studiopro
+          cat << 'EOF' > app/src/main/java/com/dhawan/studiopro/MainActivity.java
+          package com.dhawan.studiopro;
+          import android.os.Bundle;
+          import android.webkit.WebView;
+          import android.webkit.WebSettings;
+          import androidx.appcompat.app.AppCompatActivity;
+          public class MainActivity extends AppCompatActivity {
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  WebView webView = new WebView(this);
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+                  settings.setAllowFileAccess(true);
+                  webView.loadUrl("file:///android_asset/www/index.html");
+                  setContentView(webView);
+              }
+          }
+          EOF
+
+      - name: Copy Web Asset
+        run: |
+          if [ -f index.html ]; then
+            cp index.html my-app/app/src/main/assets/www/
+          else
+            echo "<h1 style='text-align:center;margin-top:50vh;'>Dhawan Studio Pro Ready</h1>" > my-app/app/src/main/assets/www/index.html
+          fi
+
+      - name: Build APK with Gradle
+        run: |
+          cd my-app
+          chmod +x gradlew || true
+          ./gradlew assembleDebug || gradle assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: my-app/app/build/outputs/apk/debug/app-debug.apk
+          
