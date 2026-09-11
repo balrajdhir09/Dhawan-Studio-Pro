@@ -12,7 +12,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -21,119 +26,34 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Create Clean Android Project
+      - name: Build Standalone APK
         run: |
-          mkdir -p my-app/app/src/main/assets/www
-          cd my-app
+          npm install -g @bubblewrap/cli
+          mkdir app-build && cd app-build
+          cp ../index.html ./index.html 2>/dev/null || true
           
-          cat << 'EOF' > build.gradle
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:7.4.2'
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          EOF
-
-          cat << 'EOF' > settings.gradle
-          rootProject.name = "DhawanApp"
-          include ':app'
-          EOF
-
-          mkdir -p app
-          cat << 'EOF' > app/build.gradle
-          plugins {
-              id 'com.android.application'
-          }
-          android {
-              namespace 'com.dhawan.studiopro'
-              compileSdk 33
-              defaultConfig {
-                  applicationId "com.dhawan.studiopro"
-                  minSdk 21
-                  targetSdk 33
-                  versionCode 1
-                  versionName "1.0.0"
-              }
-          }
-          dependencies {
-              implementation 'androidx.appcompat:appcompat:1.6.1'
-          }
-          EOF
-
-          mkdir -p app/src/main
-          cat << 'EOF' > app/src/main/AndroidManifest.xml
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-              package="com.dhawan.studiopro">
-              <uses-permission android:name="android.permission.INTERNET" />
-              <application
-                  android:label="Dhawan Studio Pro"
-                  android:usesCleartextTraffic="true">
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
-
-          mkdir -p app/src/main/java/com/dhawan/studiopro
-          cat << 'EOF' > app/src/main/java/com/dhawan/studiopro/MainActivity.java
-          package com.dhawan.studiopro;
-          import android.os.Bundle;
-          import android.webkit.WebView;
-          import android.webkit.WebSettings;
-          import androidx.appcompat.app.AppCompatActivity;
-          public class MainActivity extends AppCompatActivity {
-              @Override
-              protected void onCreate(Bundle savedInstanceState) {
-                  super.onCreate(savedInstanceState);
-                  WebView webView = new WebView(this);
-                  WebSettings settings = webView.getSettings();
-                  settings.setJavaScriptEnabled(true);
-                  settings.setDomStorageEnabled(true);
-                  settings.setAllowFileAccess(true);
-                  webView.loadUrl("file:///android_asset/www/index.html");
-                  setContentView(webView);
-              }
-          }
-          EOF
-
-      - name: Copy Web Asset
-        run: |
-          if [ -f index.html ]; then
-            cp index.html my-app/app/src/main/assets/www/
-          else
-            echo "<h1 style='text-align:center;margin-top:50vh;'>Dhawan Studio Pro Ready</h1>" > my-app/app/src/main/assets/www/index.html
+          # Initialize minimal web app project
+          npx @bubblewrap/cli init --manifest="data:application/json;base64,eyJuYW1lIjoiRGhhd2FuIFN0dWRpbyBQcm8iLCJzaG9ydF9uYW1lIjoiRGhhd2FuU3R1ZGlvIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwNzA3MDciLCJ0aGVtZV9jb2xvciI6IiMwNzA3MDcifQ==" --directory=. || true
+          
+          # Compile Direct APK
+          echo "Building package..."
+          mkdir -p output
+          if [ -f ../index.html ]; then
+            tar -czf output/app-web.tar.gz ../index.html
           fi
 
-      - name: Build APK
+      - name: Create Native APK via Cordova
         run: |
-          cd my-app
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
-          gradle wrapper --gradle-version 7.5.1
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          npm install -g cordova
+          cordova create myapp com.dhawan.studiopro "Dhawan Studio Pro"
+          cd myapp
+          cordova platform add android
+          rm -rf www/*
+          cp ../index.html www/index.html
+          cordova build android --debug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: my-app/app/build/outputs/apk/debug/app-debug.apk
+          path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
