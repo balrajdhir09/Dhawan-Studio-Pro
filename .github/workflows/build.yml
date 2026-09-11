@@ -21,6 +21,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Create Clean Android Project
         run: |
           mkdir -p my-app/app/src/main/assets/www
@@ -120,17 +123,11 @@ jobs:
             echo "<h1 style='text-align:center;margin-top:50vh;'>Dhawan Studio Pro Ready</h1>" > my-app/app/src/main/assets/www/index.html
           fi
 
-      - name: Download Gradle & Build APK
+      - name: Build APK
         run: |
           cd my-app
           export ANDROID_HOME=$ANDROID_SDK_ROOT
           echo "sdk.dir=$ANDROID_HOME" > local.properties
-          
-          # Download and setup Gradle 7.5.1 directly
-          wget -q https://services.gradle.org/distributions/gradle-7.5.1-bin.zip
-          unzip -q gradle-7.5.1-bin.zip
-          export PATH=$PWD/gradle-7.5.1/bin:$PATH
-          
           gradle wrapper --gradle-version 7.5.1
           chmod +x gradlew
           ./gradlew assembleDebug
