@@ -6,18 +6,13 @@
   <title>Dhawan Studio Pro</title>
   <meta name="theme-color" content="#000000">
 
-  <!-- Cache Control Headers -->
+  <!-- Anti-Cache Headers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <!-- Android Home Screen Launcher Icon (icon.jpg) -->
   <link rel="icon" type="image/jpeg" sizes="192x192" href="icon.jpg">
-  <link rel="icon" type="image/jpeg" sizes="512x512" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
-
-  <!-- Dynamic Web App Manifest for Android OS -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"Dhawan Studio Pro","short_name":"DhawanStudio","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"icon.jpg","sizes":"192x192","type":"image/jpeg"},{"src":"icon.jpg","sizes":"512x512","type":"image/jpeg"}]}'>
 
   <style>
     :root {
@@ -30,7 +25,7 @@
       --text-dim: #9ca3af;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     
     html, body {
       width: 100%;
@@ -41,7 +36,7 @@
       scroll-behavior: smooth;
     }
 
-    /* Header with Stacked Action Buttons */
+    /* Header */
     header {
       position: sticky;
       top: 0;
@@ -53,15 +48,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
     }
     
     .brand-wrap { display: flex; flex-direction: column; gap: 1px; }
-    .brand { font-weight: 900; font-size: 15px; letter-spacing: 0.6px; color: #fff; display: flex; align-items: center; gap: 5px; }
+    .brand { font-weight: 900; font-size: 15px; letter-spacing: 0.6px; color: #fff; }
     .brand span { color: var(--blood-bright); }
-    .sub-brand-tag { font-size: 9.5px; font-weight: 700; color: #ff4d4d; letter-spacing: 1.5px; text-transform: uppercase; user-select: none; }
+    .sub-brand-tag { font-size: 9.5px; font-weight: 700; color: #ff4d4d; letter-spacing: 1.5px; text-transform: uppercase; }
 
-    /* Vertical stacked header buttons */
     .header-actions-col {
       display: flex;
       flex-direction: column;
@@ -69,7 +62,7 @@
       align-items: flex-end;
     }
 
-    .update-pill-sm {
+    .token-pill-sm {
       background: #180505;
       border: 1px solid var(--blood-bright);
       color: #ff7777;
@@ -78,12 +71,7 @@
       padding: 3px 8px;
       border-radius: 12px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: 0.2s;
     }
-    .update-pill-sm:hover { background: var(--blood-red); color: #fff; }
 
     .vault-pill-sm {
       background: #140505;
@@ -97,9 +85,7 @@
       display: flex;
       align-items: center;
       gap: 5px;
-      transition: 0.2s;
     }
-    .vault-pill-sm:hover { background: #220808; }
     .vault-count {
       background: var(--blood-bright);
       color: #fff;
@@ -126,8 +112,6 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      width: 100%;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
     }
 
     .title-row {
@@ -141,17 +125,9 @@
       letter-spacing: 0.8px;
     }
 
-    .input-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      width: 100%;
-    }
-    @media(max-width: 480px) { .input-grid { grid-template-columns: 1fr; } }
+    label { font-size: 12px; color: var(--text-dim); display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
     
-    label { font-size: 12px; color: var(--text-dim); display: flex; flex-direction: column; gap: 4px; font-weight: 600; width: 100%; }
-    
-    input[type="text"], input[type="number"], select, textarea {
+    input[type="text"], textarea {
       width: 100%;
       background: #000000;
       border: 1px solid #2a0808;
@@ -160,16 +136,13 @@
       color: #fff;
       font-size: 13.5px;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input[type="text"]:focus, textarea:focus { border-color: var(--blood-bright); box-shadow: 0 0 8px rgba(220, 38, 38, 0.4); }
+    input[type="text"]:focus, textarea:focus { border-color: var(--blood-bright); }
     
     textarea { 
       min-height: 180px; 
       font-family: ui-monospace, monospace; 
-      line-height: 1.45; 
       font-size: 12.5px; 
-      tab-size: 2; 
       resize: vertical; 
     }
 
@@ -178,15 +151,12 @@
       border-style: dashed !important;
       color: #aaa !important;
       background: #040101 !important;
-      user-select: none;
     }
     .locked-input:not([readonly]) {
       cursor: text !important;
       border-style: solid !important;
       color: #fff !important;
-      background: #000000 !important;
       border-color: var(--blood-bright) !important;
-      user-select: auto;
     }
 
     .icon-box {
@@ -211,45 +181,15 @@
       flex-shrink: 0;
     }
     .icon-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .icon-preview svg { width: 65%; height: 65%; fill: var(--blood-bright); }
+    .icon-preview svg { width: 60%; height: 60%; fill: var(--blood-bright); }
 
-    .popup-trigger-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      width: 100%;
-    }
-    @media(max-width: 580px) { .popup-trigger-row { grid-template-columns: 1fr; } }
-
-    .modal-trigger-btn {
-      background: #140505;
-      border: 1px solid var(--blood-red);
-      padding: 10px 12px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      color: #eee;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .trigger-badge {
-      background: var(--blood-bright);
-      color: #fff;
-      padding: 2px 7px;
-      border-radius: 10px;
-      font-size: 10px;
-      font-weight: 800;
-    }
-
-    .install-big-btn {
+    .build-apk-btn {
       background: linear-gradient(135deg, #8b0000, #dc2626);
       color: #fff;
       border: 1px solid #ff4d4d;
-      padding: 13px 12px;
+      padding: 14px 12px;
       border-radius: 8px;
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -257,10 +197,10 @@
       justify-content: center;
       gap: 8px;
       width: 100%;
-      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
       transition: all 0.2s;
     }
-    .install-big-btn:hover { background: linear-gradient(135deg, #a00000, #ef4444); }
+    .build-apk-btn:active { transform: scale(0.98); }
 
     .btn-row { 
       display: grid; 
@@ -268,7 +208,6 @@
       gap: 8px; 
       width: 100%;
     }
-    @media(max-width: 480px) { .btn-row { grid-template-columns: 1fr; } }
 
     button.action-btn {
       padding: 10px 8px;
@@ -280,11 +219,9 @@
       background: #080202;
       color: #ccc;
       text-align: center;
-      transition: 0.2s;
     }
     button.action-btn:hover { background: #1c0707; color: #fff; border-color: var(--blood-red); }
 
-    /* Live Preview Panel */
     .preview-panel {
       background: #080202;
       border: 1px solid var(--card-border);
@@ -294,24 +231,6 @@
       flex-direction: column;
       align-items: center;
       gap: 14px;
-      width: 100%;
-    }
-
-    .preview-header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .mini-ctrl-btn {
-      background: #180808;
-      border: 1px solid #3d0e0e;
-      color: #bbb;
-      padding: 4px 8px;
-      font-size: 11px;
-      border-radius: 4px;
-      cursor: pointer;
     }
 
     .phone {
@@ -325,21 +244,12 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      position: relative;
     }
     
-    .notch-bar { height: 20px; background: #000000; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+    .notch-bar { height: 20px; background: #000000; display: flex; justify-content: center; align-items: center; }
     .camera { width: 8px; height: 8px; background: #0e0e0e; border-radius: 50%; }
-
-    iframe {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #000000 !important;
-    }
-
-    .nav-bar-pill { height: 16px; background: #000000; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+    iframe { flex: 1; width: 100%; height: 100%; border: none; background: #000000 !important; }
+    .nav-bar-pill { height: 16px; background: #000000; display: flex; justify-content: center; align-items: center; }
     .gesture-indicator { width: 90px; height: 3px; background: #262626; border-radius: 4px; }
 
     footer.app-footer {
@@ -350,10 +260,8 @@
       letter-spacing: 2px;
       color: #ff4d4d;
       text-transform: uppercase;
-      user-select: none;
     }
 
-    /* Modals */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -378,7 +286,6 @@
       flex-direction: column;
       overflow: hidden;
     }
-
     .modal-header {
       padding: 12px 16px;
       border-bottom: 1px solid #200606;
@@ -389,9 +296,25 @@
     }
     .modal-title { font-size: 13px; font-weight: bold; color: #fff; }
     .close-icon { background: none; border: none; color: #999; font-size: 20px; cursor: pointer; }
-    .modal-body { padding: 14px; overflow-y: auto; max-height: 380px; display: flex; flex-direction: column; gap: 12px; }
+    .modal-body { padding: 14px; overflow-y: auto; max-height: 380px; display: flex; flex-direction: column; gap: 10px; }
     .modal-footer { padding: 10px 14px; border-top: 1px solid #200606; background: #120404; display: flex; justify-content: flex-end; }
     .btn-apply { background: var(--blood-bright); color: #fff; border: none; padding: 8px 16px; font-weight: bold; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+    .vault-card {
+      background: #080202;
+      border: 1px solid #2a0808;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .vault-meta { display: flex; flex-direction: column; gap: 2px; }
+    .vault-name { font-size: 13px; font-weight: bold; color: #fff; }
+    .vault-date { font-size: 10px; color: #777; }
+    .vault-btns { display: flex; gap: 6px; }
+    .v-btn-load { background: #180505; border: 1px solid var(--blood-bright); color: #ff8888; font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .v-btn-del { background: #100202; border: 1px solid #440000; color: #888; font-size: 11px; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
 
     #toast {
       position: fixed;
@@ -420,9 +343,8 @@
       <span class="sub-brand-tag">welcome to shubh world</span>
     </div>
     
-    <!-- Stacked Action Buttons -->
     <div class="header-actions-col">
-      <button class="update-pill-sm" onclick="forceAppRefresh()">⚡ Check Update</button>
+      <button class="token-pill-sm" onclick="openModal('tokenModal')">🔑 Factory Token</button>
       <button class="vault-pill-sm" onclick="openVaultModal()">
         <span>📦 Vault</span>
         <span class="vault-count" id="vaultHeaderBadge">0</span>
@@ -434,23 +356,22 @@
     <div class="panel">
       <div class="title-row">
         <span>App Configuration</span>
-        <span style="color:#ff6666; font-size:10px;">Pro Studio Active</span>
+        <span style="color:#ff6666; font-size:10px;">APK Factory Active</span>
       </div>
 
       <label>
         App Name
-        <input type="text" id="appName" value="Dhawan Studio Pro" oninput="handleInputSync()">
+        <input type="text" id="appName" value="My Project" oninput="handleInputSync()">
       </label>
 
       <label>
         Package Identifier <span style="font-size:9.5px; color:#ff6666;">[🔒 Double-tap to edit]</span>
-        <input type="text" id="pkgName" class="locked-input" value="com.dhawan.studiopro" readonly>
+        <input type="text" id="pkgName" class="locked-input" value="com.dhawan.myproject" readonly>
       </label>
 
       <div class="icon-box">
         <div class="icon-preview" id="iconDisplay">
-          <!-- Checks icon.jpg first, else falls back to SVG emblem -->
-          <img src="icon.jpg" onerror="this.onerror=null;this.parentElement.innerHTML='<svg viewBox=\'0 0 24 24\'><path d=\'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\'/></svg>';" alt="App Icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         </div>
         <label style="flex: 1;">
           Change App Icon (.jpg / .png)
@@ -458,39 +379,23 @@
         </label>
       </div>
 
-      <div class="title-row">Engine, Security & Features</div>
-      <div class="popup-trigger-row">
-        <div class="modal-trigger-btn" onclick="openModal('buildModal')">
-          <span>⚙ Build Specs</span>
-          <span class="trigger-badge">v1.0.0</span>
-        </div>
-        <div class="modal-trigger-btn" onclick="openModal('permModal')">
-          <span>🛡 Permissions</span>
-          <span class="trigger-badge">1 Active</span>
-        </div>
-        <div class="modal-trigger-btn" onclick="openModal('extraModal')">
-          <span>⚡ Features</span>
-          <span class="trigger-badge">Active</span>
-        </div>
-      </div>
-
       <div class="title-row">Source Code (HTML / CSS / JS)</div>
-      <textarea id="sourceCode" oninput="runCode(false)" spellcheck="false" placeholder="Write or paste your app HTML/CSS/JS here..."></textarea>
+      <textarea id="sourceCode" oninput="runCode(false)" placeholder="Paste your HTML/CSS/JS project code here..."></textarea>
 
-      <button class="install-big-btn" onclick="triggerAppInstall()">📲 Install on Phone</button>
+      <!-- REAL CLOUD FACTORY TRIGGER -->
+      <button class="build-apk-btn" id="buildBtn" onclick="triggerCloudAPKBuild()">⚡ BUILD NATIVE APK</button>
 
       <div class="btn-row">
         <button class="action-btn" onclick="runCode(true)">👁 Render</button>
-        <button class="action-btn" onclick="saveMobileFile()">💾 Save App</button>
-        <button class="action-btn" onclick="document.getElementById('bundleImporter').click()">📂 Import</button>
+        <button class="action-btn" onclick="saveToVaultAndStorage()">💾 Save App</button>
+        <button class="action-btn" onclick="downloadLatestAPKDirect()">⬇️ Download APK</button>
       </div>
-      <input type="file" id="bundleImporter" accept=".html,.json" style="display: none;" onchange="importProject(event)">
     </div>
 
     <div class="preview-panel" id="previewSection">
-      <div class="preview-header">
+      <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
         <span class="title-row">Live Mobile Screen</span>
-        <button class="mini-ctrl-btn" onclick="runCode(false)">&#x21bb; Reload</button>
+        <button class="token-pill-sm" onclick="runCode(false)">&#x21bb; Reload</button>
       </div>
 
       <div class="phone">
@@ -503,49 +408,25 @@
     <footer class="app-footer">welcome to shubh world</footer>
   </div>
 
-  <!-- Build Specs Modal -->
-  <div class="modal-backdrop" id="buildModal">
+  <!-- Token Modal -->
+  <div class="modal-backdrop" id="tokenModal">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title">⚙ Android Build Specs</div>
-        <button class="close-icon" onclick="closeModal('buildModal')">&times;</button>
+        <div class="modal-title">🔑 GitHub Factory Token</div>
+        <button class="close-icon" onclick="closeModal('tokenModal')">&times;</button>
       </div>
       <div class="modal-body">
-        <label>Version Name <input type="text" value="1.0.0"></label>
-        <label>Status Bar Color <input type="text" value="#000000"></label>
+        <label>
+          GitHub Personal Access Token (PAT)
+          <input type="text" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxx">
+        </label>
+        <div style="font-size: 11px; color: #aaa; line-height: 1.4;">
+          Yeh token Dhawan Studio Pro ko aapke GitHub server par direct APK compile karne ka order deta hai. Yeh aapke browser memory me 100% safe save rahega.
+        </div>
       </div>
-      <div class="modal-footer"><button class="btn-apply" onclick="closeModal('buildModal')">Done</button></div>
-    </div>
-  </div>
-
-  <!-- Permissions Modal -->
-  <div class="modal-backdrop" id="permModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title">🛡 Android Permissions</div>
-        <button class="close-icon" onclick="closeModal('permModal')">&times;</button>
+      <div class="modal-footer">
+        <button class="btn-apply" onclick="saveGithubToken()">Save Token</button>
       </div>
-      <div class="modal-body" style="display:flex; flex-direction:column; gap:8px;">
-        <label><input type="checkbox" checked> INTERNET</label>
-        <label><input type="checkbox"> CAMERA</label>
-        <label><input type="checkbox"> STORAGE</label>
-      </div>
-      <div class="modal-footer"><button class="btn-apply" onclick="closeModal('permModal')">Done</button></div>
-    </div>
-  </div>
-
-  <!-- Extra Features Modal -->
-  <div class="modal-backdrop" id="extraModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <div class="modal-title">⚡ Extra Features</div>
-        <button class="close-icon" onclick="closeModal('extraModal')">&times;</button>
-      </div>
-      <div class="modal-body">
-        <label>Hardware Acceleration: <b>Enabled (60 FPS)</b></label>
-        <label>Rendering Engine: <b>Chromium WebCore</b></label>
-      </div>
-      <div class="modal-footer"><button class="btn-apply" onclick="closeModal('extraModal')">Done</button></div>
     </div>
   </div>
 
@@ -556,9 +437,7 @@
         <div class="modal-title">📦 Saved Projects Vault</div>
         <button class="close-icon" onclick="closeModal('vaultModal')">&times;</button>
       </div>
-      <div class="modal-body">
-        <div style="color:#666; font-size:12px; text-align:center; padding:20px;">Use 'Save App' to store apps in local memory.</div>
-      </div>
+      <div class="modal-body" id="vaultListContainer"></div>
       <div class="modal-footer"><button class="btn-apply" onclick="closeModal('vaultModal')">Close</button></div>
     </div>
   </div>
@@ -566,38 +445,17 @@
   <div id="toast">Ready</div>
 
   <script>
-    let installPrompt = null;
+    let customIconBase64 = null;
 
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.innerText = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2200);
+      setTimeout(() => t.classList.remove('show'), 2600);
     }
 
-    function forceAppRefresh() {
-      if ('caches' in window) {
-        caches.keys().then(names => {
-          names.forEach(name => caches.delete(name));
-        });
-      }
-      showToast('Cache cleared! Syncing...');
-      setTimeout(() => { window.location.reload(true); }, 400);
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      installPrompt = e;
-    });
-
-    function triggerAppInstall() {
-      if (installPrompt) {
-        installPrompt.prompt();
-        installPrompt.userChoice.then(() => { installPrompt = null; });
-      } else {
-        showToast('Browser menu (⋮) kholkar "Add to Home screen" select karein!');
-      }
-    }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     function handleInputSync() {
       const name = document.getElementById('appName').value.trim();
@@ -617,87 +475,187 @@
       el.addEventListener('blur', () => { el.setAttribute('readonly', 'true'); });
     }
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    function openVaultModal() { openModal('vaultModal'); }
+    function saveGithubToken() {
+      const tok = document.getElementById('ghTokenInput').value.trim();
+      if (!tok) { showToast('Token paste karein!'); return; }
+      localStorage.setItem('dhawan_gh_token', tok);
+      closeModal('tokenModal');
+      showToast('Factory Token Linked Successfully!');
+    }
+
+    // CLOUD APK TRIGGER PIPELINE
+    async function triggerCloudAPKBuild() {
+      const token = localStorage.getItem('dhawan_gh_token');
+      if (!token) {
+        showToast('Pehle upar "🔑 Factory Token" me apna token save karein!');
+        openModal('tokenModal');
+        return;
+      }
+
+      const code = document.getElementById('sourceCode').value.trim();
+      const appName = document.getElementById('appName').value.trim() || 'My App';
+      const pkgName = document.getElementById('pkgName').value.trim() || 'com.dhawan.app';
+
+      if (!code) {
+        showToast('Source code khali hai!');
+        return;
+      }
+
+      const btn = document.getElementById('buildBtn');
+      btn.innerText = '⚙ Sending to Cloud Compiler...';
+      btn.style.opacity = '0.7';
+
+      try {
+        const payload = {
+          event_type: 'build_user_app',
+          client_payload: {
+            app_name: appName,
+            pkg_name: pkgName,
+            html_code: code,
+            icon_base64: customIconBase64 || ''
+          }
+        };
+
+        const res = await fetch('https://api.github.com/repos/balrajdhir09/Dhawan-Studio-Pro/dispatches', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            'Authorization': 'token ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 204) {
+          showToast('🚀 Build Start ho gayi hai! 50 second wait karein...');
+          btn.innerText = '⏳ Compiling APK (Takes ~50s)...';
+          setTimeout(() => {
+            btn.innerText = '⬇️ APK Ready! Tap "Download APK"';
+            btn.style.opacity = '1';
+          }, 55000);
+        } else {
+          showToast('Error: Token check karein');
+          btn.innerText = '⚡ BUILD NATIVE APK';
+          btn.style.opacity = '1';
+        }
+      } catch(e) {
+        showToast('Network error');
+        btn.innerText = '⚡ BUILD NATIVE APK';
+        btn.style.opacity = '1';
+      }
+    }
+
+    function downloadLatestAPKDirect() {
+      showToast('Downloading compiled APK...');
+      const url = 'https://github.com/balrajdhir09/Dhawan-Studio-Pro/releases/download/latest-build/DhawanStudioPro.apk';
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'DhawanStudioPro.apk';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    /* VAULT ENGINE */
+    function getVault() {
+      try { return JSON.parse(localStorage.getItem('dhawan_vault_projects') || '[]'); }
+      catch(e) { return []; }
+    }
+
+    function saveToVaultAndStorage() {
+      const code = document.getElementById('sourceCode').value.trim();
+      const name = document.getElementById('appName').value.trim() || 'MyApp';
+
+      if (!code) { showToast('Pehle source code box me code likhein!'); return; }
+
+      let vault = getVault();
+      vault.unshift({
+        id: 'p_' + Date.now(),
+        name: name,
+        code: code,
+        date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      });
+
+      localStorage.setItem('dhawan_vault_projects', JSON.stringify(vault));
+      updateVaultBadge();
+      showToast(`Saved to Vault! Total: ${vault.length}`);
+    }
+
+    function updateVaultBadge() {
+      const v = getVault();
+      document.getElementById('vaultHeaderBadge').innerText = v.length;
+    }
+
+    function openVaultModal() {
+      const box = document.getElementById('vaultListContainer');
+      const v = getVault();
+      if (v.length === 0) {
+        box.innerHTML = '<div style="color:#666; font-size:12px; text-align:center; padding:24px;">Vault khali hai.</div>';
+      } else {
+        let h = '';
+        v.forEach(item => {
+          h += `
+            <div class="vault-card">
+              <div class="vault-meta">
+                <span class="vault-name">${item.name}</span>
+                <span class="vault-date">${item.date}</span>
+              </div>
+              <div class="vault-btns">
+                <button class="v-btn-load" onclick="loadProject('${item.id}')">Load</button>
+                <button class="v-btn-del" onclick="delProject('${item.id}')">✕</button>
+              </div>
+            </div>
+          `;
+        });
+        box.innerHTML = h;
+      }
+      openModal('vaultModal');
+    }
+
+    function loadProject(id) {
+      const item = getVault().find(p => p.id === id);
+      if (item) {
+        document.getElementById('appName').value = item.name;
+        document.getElementById('sourceCode').value = item.code;
+        runCode(false);
+        closeModal('vaultModal');
+        showToast('Loaded: ' + item.name);
+      }
+    }
+
+    function delProject(id) {
+      let v = getVault().filter(p => p.id !== id);
+      localStorage.setItem('dhawan_vault_projects', JSON.stringify(v));
+      updateVaultBadge();
+      openVaultModal();
+      showToast('Project deleted');
+    }
 
     function loadIcon(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          const maxDim = 256;
-          let w = img.width, h = img.height;
-          if (w > h) { if (w > maxDim) { h *= maxDim / w; w = maxDim; } }
-          else { if (h > maxDim) { w *= maxDim / h; h = maxDim; } }
-
-          canvas.width = w; canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
-
-          const compressed = canvas.toDataURL('image/jpeg', 0.85);
-          localStorage.setItem('dhawan_app_icon', compressed);
-          applyLoadedIcon(compressed);
-          showToast('Custom Icon Saved & Applied!');
-        };
-        img.src = e.target.result;
+        customIconBase64 = e.target.result;
+        document.getElementById('iconDisplay').innerHTML = `<img src="${customIconBase64}">`;
+        showToast('Custom Icon Loaded!');
       };
       reader.readAsDataURL(file);
-    }
-
-    function applyLoadedIcon(src) {
-      document.getElementById('iconDisplay').innerHTML = `<img src="${src}">`;
     }
 
     function runCode(scroll) {
       const raw = document.getElementById('sourceCode').value;
       const iframe = document.getElementById('phoneScreen');
-      
-      const pitchBlackEmpty = `<!DOCTYPE html><html><body style="margin:0;background:#000;color:#222;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:11px;letter-spacing:2px;">AWAITING INPUT</body></html>`;
-
-      iframe.srcdoc = raw.trim() ? raw : pitchBlackEmpty;
-      if (scroll) {
-        document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    function saveMobileFile() {
-      const code = document.getElementById('sourceCode').value;
-      const name = document.getElementById('appName').value.trim() || 'MyApp';
-
-      if (!code.trim()) { showToast('Pehle source code box me code likhein!'); return; }
-
-      const blob = new Blob([code], { type: 'text/html' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = name.replace(/\s+/g, '_').toLowerCase() + '.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
-      showToast('App saved!');
-    }
-
-    function importProject(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        document.getElementById('sourceCode').value = e.target.result;
-        runCode(false);
-        showToast('Imported Successfully!');
-      };
-      reader.readAsText(file);
+      const empty = `<!DOCTYPE html><html><body style="margin:0;background:#000;color:#222;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:11px;letter-spacing:2px;">AWAITING INPUT</body></html>`;
+      iframe.srcdoc = raw.trim() ? raw : empty;
+      if (scroll) document.getElementById('previewSection').scrollIntoView({ behavior: 'smooth' });
     }
 
     window.onload = function() {
       attachDoubleTap('pkgName');
-      const savedIcon = localStorage.getItem('dhawan_app_icon');
-      if (savedIcon) applyLoadedIcon(savedIcon);
+      updateVaultBadge();
+      const savedTok = localStorage.getItem('dhawan_gh_token');
+      if (savedTok) document.getElementById('ghTokenInput').value = savedTok;
       runCode(false);
     };
   </script>
