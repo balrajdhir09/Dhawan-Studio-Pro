@@ -6,20 +6,24 @@
   <title>Dhawan Studio Pro</title>
   <meta name="theme-color" content="#000000">
 
-  <!-- Cache Buster Headers -->
+  <!-- Cache Control Headers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 
-  <!-- Dynamic Web App Manifest -->
-  <link rel="manifest" id="dynamicManifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Dhawan%20Studio%20Pro%22%2C%22short_name%22%3A%22DhawanStudio%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%2C%22icons%22%3A%5B%5D%7D">
+  <!-- Android Home Screen Launcher Icon (icon.jpg) -->
+  <link rel="icon" type="image/jpeg" sizes="192x192" href="icon.jpg">
+  <link rel="icon" type="image/jpeg" sizes="512x512" href="icon.jpg">
+  <link rel="apple-touch-icon" href="icon.jpg">
+
+  <!-- Dynamic Web App Manifest for Android OS -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Dhawan Studio Pro","short_name":"DhawanStudio","start_url":".","display":"standalone","background_color":"#000000","theme_color":"#000000","icons":[{"src":"icon.jpg","sizes":"192x192","type":"image/jpeg"},{"src":"icon.jpg","sizes":"512x512","type":"image/jpeg"}]}'>
 
   <style>
     :root {
       --bg: #050505;
       --card: #0d0d0d;
       --card-border: #220808;
-      --blood-dark: #440000;
       --blood-red: #8b0000;
       --blood-bright: #dc2626;
       --text: #f4f4f5;
@@ -37,7 +41,7 @@
       scroll-behavior: smooth;
     }
 
-    /* Header */
+    /* Header with Stacked Action Buttons */
     header {
       position: sticky;
       top: 0;
@@ -45,7 +49,7 @@
       background: rgba(10, 2, 2, 0.98);
       backdrop-filter: blur(8px);
       border-bottom: 2px solid var(--blood-red);
-      padding: 10px 16px;
+      padding: 8px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -53,69 +57,65 @@
     }
     
     .brand-wrap { display: flex; flex-direction: column; gap: 1px; }
-    .brand { font-weight: 900; font-size: 16px; letter-spacing: 0.8px; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .brand { font-weight: 900; font-size: 15px; letter-spacing: 0.6px; color: #fff; display: flex; align-items: center; gap: 5px; }
     .brand span { color: var(--blood-bright); }
+    .sub-brand-tag { font-size: 9.5px; font-weight: 700; color: #ff4d4d; letter-spacing: 1.5px; text-transform: uppercase; user-select: none; }
 
-    .sub-brand-tag {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #ff4d4d;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      text-shadow: 0 0 10px rgba(220, 38, 38, 0.45);
-      user-select: none;
-      margin-top: 1px;
+    /* Vertical stacked header buttons */
+    .header-actions-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-end;
     }
 
-    .header-actions { display: flex; align-items: center; gap: 8px; }
-    
-    .update-pill {
+    .update-pill-sm {
       background: #180505;
       border: 1px solid var(--blood-bright);
       color: #ff7777;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
-      padding: 5px 9px;
-      border-radius: 14px;
+      padding: 3px 8px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 4px;
       transition: 0.2s;
     }
-    .update-pill:hover { background: var(--blood-red); color: #fff; }
+    .update-pill-sm:hover { background: var(--blood-red); color: #fff; }
 
-    .vault-pill-btn {
-      background: #180505;
-      border: 1px solid var(--blood-bright);
-      color: #fff;
-      font-size: 11px;
+    .vault-pill-sm {
+      background: #140505;
+      border: 1px solid var(--blood-red);
+      color: #ddd;
+      font-size: 10px;
       font-weight: bold;
-      padding: 5px 10px;
-      border-radius: 20px;
+      padding: 3px 8px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: 0.2s;
     }
-    .vault-pill-btn:hover { background: var(--blood-red); }
+    .vault-pill-sm:hover { background: #220808; }
     .vault-count {
       background: var(--blood-bright);
       color: #fff;
-      font-size: 10px;
-      padding: 1px 6px;
-      border-radius: 10px;
+      font-size: 9px;
+      padding: 0 5px;
+      border-radius: 8px;
     }
 
     .container {
       width: 100%;
       max-width: 680px;
       margin: 0 auto;
-      padding: 16px 12px 20px 12px;
+      padding: 14px 12px 20px 12px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
     .panel {
@@ -147,9 +147,7 @@
       gap: 10px;
       width: 100%;
     }
-    @media(max-width: 480px) {
-      .input-grid { grid-template-columns: 1fr; }
-    }
+    @media(max-width: 480px) { .input-grid { grid-template-columns: 1fr; } }
     
     label { font-size: 12px; color: var(--text-dim); display: flex; flex-direction: column; gap: 4px; font-weight: 600; width: 100%; }
     
@@ -164,10 +162,8 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
-      border-color: var(--blood-bright);
-      box-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
-    }
+    input[type="text"]:focus, textarea:focus { border-color: var(--blood-bright); box-shadow: 0 0 8px rgba(220, 38, 38, 0.4); }
+    
     textarea { 
       min-height: 180px; 
       font-family: ui-monospace, monospace; 
@@ -190,7 +186,6 @@
       color: #fff !important;
       background: #000000 !important;
       border-color: var(--blood-bright) !important;
-      box-shadow: 0 0 10px rgba(220, 38, 38, 0.45);
       user-select: auto;
     }
 
@@ -215,7 +210,8 @@
       overflow: hidden;
       flex-shrink: 0;
     }
-    .icon-preview img, .icon-preview svg { width: 100%; height: 100%; object-fit: cover; }
+    .icon-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .icon-preview svg { width: 65%; height: 65%; fill: var(--blood-bright); }
 
     .popup-trigger-row {
       display: grid;
@@ -223,9 +219,7 @@
       gap: 8px;
       width: 100%;
     }
-    @media(max-width: 580px) {
-      .popup-trigger-row { grid-template-columns: 1fr; }
-    }
+    @media(max-width: 580px) { .popup-trigger-row { grid-template-columns: 1fr; } }
 
     .modal-trigger-btn {
       background: #140505;
@@ -239,10 +233,7 @@
       color: #eee;
       font-size: 12px;
       font-weight: 600;
-      transition: all 0.2s;
     }
-    .modal-trigger-btn:hover { background: #240808; border-color: var(--blood-bright); }
-    
     .trigger-badge {
       background: var(--blood-bright);
       color: #fff;
@@ -252,61 +243,32 @@
       font-weight: 800;
     }
 
-    /* Action Buttons Row */
-    .primary-install-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 4px;
-    }
-    @media(max-width: 480px) {
-      .primary-install-box { grid-template-columns: 1fr; }
-    }
-
     .install-big-btn {
       background: linear-gradient(135deg, #8b0000, #dc2626);
       color: #fff;
       border: 1px solid #ff4d4d;
       padding: 13px 12px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.35);
       transition: all 0.2s;
     }
     .install-big-btn:hover { background: linear-gradient(135deg, #a00000, #ef4444); }
 
-    .apk-cloud-btn {
-      background: #140505;
-      color: #ff6666;
-      border: 1px solid var(--blood-red);
-      padding: 13px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
-    }
-    .apk-cloud-btn:hover { background: #240808; border-color: var(--blood-bright); color: #fff; }
-
     .btn-row { 
       display: grid; 
-      grid-template-columns: repeat(4, 1fr); 
+      grid-template-columns: repeat(3, 1fr); 
       gap: 8px; 
       width: 100%;
     }
-    @media(max-width: 520px) { 
-      .btn-row { grid-template-columns: 1fr 1fr; } 
-    }
+    @media(max-width: 480px) { .btn-row { grid-template-columns: 1fr; } }
 
     button.action-btn {
       padding: 10px 8px;
@@ -317,8 +279,8 @@
       border: 1px solid #2e0d0d;
       background: #080202;
       color: #ccc;
-      transition: 0.2s;
       text-align: center;
+      transition: 0.2s;
     }
     button.action-btn:hover { background: #1c0707; color: #fff; border-color: var(--blood-red); }
 
@@ -327,11 +289,11 @@
       background: #080202;
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      padding: 18px 14px 24px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       width: 100%;
     }
 
@@ -346,7 +308,7 @@
       background: #180808;
       border: 1px solid #3d0e0e;
       color: #bbb;
-      padding: 5px 10px;
+      padding: 4px 8px;
       font-size: 11px;
       border-radius: 4px;
       cursor: pointer;
@@ -359,7 +321,7 @@
       background: #000000 !important;
       border: 5px solid #1a0606;
       border-radius: 34px;
-      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.95), 0 0 24px rgba(139, 0, 0, 0.25);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.95);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -410,7 +372,7 @@
       border: 1px solid #4a1010;
       border-radius: 12px;
       width: 100%;
-      max-width: 530px;
+      max-width: 500px;
       max-height: 86vh;
       display: flex;
       flex-direction: column;
@@ -427,50 +389,8 @@
     }
     .modal-title { font-size: 13px; font-weight: bold; color: #fff; }
     .close-icon { background: none; border: none; color: #999; font-size: 20px; cursor: pointer; }
-
     .modal-body { padding: 14px; overflow-y: auto; max-height: 380px; display: flex; flex-direction: column; gap: 12px; }
-
-    .cfg-sub-title {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--blood-bright);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      border-bottom: 1px dashed #280909;
-      padding-bottom: 4px;
-    }
-    .cfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    @media(max-width: 440px) { .cfg-grid { grid-template-columns: 1fr; } }
-    
-    .cfg-item { display: flex; flex-direction: column; gap: 4px; }
-    .cfg-item span { font-size: 11px; color: var(--text-dim); font-weight: 600; }
-    .cfg-item input, .cfg-item select { padding: 8px 10px; font-size: 12.5px; }
-
-    .perm-grid-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    @media(max-width: 420px) { .perm-grid-compact { grid-template-columns: 1fr; } }
-
-    .p-chip {
-      background: #080808;
-      border: 1px solid #220808;
-      padding: 7px 9px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      cursor: pointer;
-      font-size: 11px;
-      color: #ccc;
-    }
-    .p-chip:has(input:checked) { background: #180505; border-color: var(--blood-red); color: #fff; }
-    .p-chip input { accent-color: var(--blood-bright); }
-
-    .modal-footer {
-      padding: 10px 14px;
-      border-top: 1px solid #200606;
-      background: #120404;
-      display: flex;
-      justify-content: flex-end;
-    }
+    .modal-footer { padding: 10px 14px; border-top: 1px solid #200606; background: #120404; display: flex; justify-content: flex-end; }
     .btn-apply { background: var(--blood-bright); color: #fff; border: none; padding: 8px 16px; font-weight: bold; border-radius: 6px; font-size: 12px; cursor: pointer; }
 
     #toast {
@@ -485,7 +405,6 @@
       font-weight: 600;
       padding: 8px 18px;
       border-radius: 20px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.85);
       transition: transform 0.25s ease, opacity 0.25s ease;
       opacity: 0;
       z-index: 9999;
@@ -500,9 +419,11 @@
       <div class="brand">&#x25C6; DHAWAN STUDIO <span>PRO</span></div>
       <span class="sub-brand-tag">welcome to shubh world</span>
     </div>
-    <div class="header-actions">
-      <button class="update-pill" onclick="forceAppRefresh()">⚡ Check Update</button>
-      <button class="vault-pill-btn" onclick="openVaultModal()">
+    
+    <!-- Stacked Action Buttons -->
+    <div class="header-actions-col">
+      <button class="update-pill-sm" onclick="forceAppRefresh()">⚡ Check Update</button>
+      <button class="vault-pill-sm" onclick="openVaultModal()">
         <span>📦 Vault</span>
         <span class="vault-count" id="vaultHeaderBadge">0</span>
       </button>
@@ -510,29 +431,26 @@
   </header>
 
   <div class="container">
-    
     <div class="panel">
-      
       <div class="title-row">
         <span>App Configuration</span>
         <span style="color:#ff6666; font-size:10px;">Pro Studio Active</span>
       </div>
 
-      <div class="input-grid">
-        <label>
-          App Name
-          <input type="text" id="appName" value="Dhawan Studio Pro" oninput="handleInputSync()">
-        </label>
-        <label>
-          Package Identifier <span style="font-size:9.5px; color:#ff6666;">[🔒 Double-tap]</span>
-          <input type="text" id="pkgName" class="locked-input" value="com.dhawan.studiopro" readonly>
-        </label>
-      </div>
+      <label>
+        App Name
+        <input type="text" id="appName" value="Dhawan Studio Pro" oninput="handleInputSync()">
+      </label>
+
+      <label>
+        Package Identifier <span style="font-size:9.5px; color:#ff6666;">[🔒 Double-tap to edit]</span>
+        <input type="text" id="pkgName" class="locked-input" value="com.dhawan.studiopro" readonly>
+      </label>
 
       <div class="icon-box">
         <div class="icon-preview" id="iconDisplay">
-          <!-- Auto checks icon.jpg first, then icon.png, else SVG emblem -->
-          <img src="icon.jpg" onerror="this.onerror=null;this.src='icon.png';" alt="App Icon">
+          <!-- Checks icon.jpg first, else falls back to SVG emblem -->
+          <img src="icon.jpg" onerror="this.onerror=null;this.parentElement.innerHTML='<svg viewBox=\'0 0 24 24\'><path d=\'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5\'/></svg>';" alt="App Icon">
         </div>
         <label style="flex: 1;">
           Change App Icon (.jpg / .png)
@@ -542,47 +460,33 @@
 
       <div class="title-row">Engine, Security & Features</div>
       <div class="popup-trigger-row">
-        <div class="modal-trigger-btn" onclick="openBuildModal()">
+        <div class="modal-trigger-btn" onclick="openModal('buildModal')">
           <span>⚙ Build Specs</span>
-          <span class="trigger-badge" id="buildBadge">v1.0.0</span>
+          <span class="trigger-badge">v1.0.0</span>
         </div>
-        <div class="modal-trigger-btn" onclick="openPermModal()">
+        <div class="modal-trigger-btn" onclick="openModal('permModal')">
           <span>🛡 Permissions</span>
-          <span class="trigger-badge" id="permBadge">1 Active</span>
+          <span class="trigger-badge">1 Active</span>
         </div>
-        <div class="modal-trigger-btn" onclick="openExtraFeaturesModal()">
+        <div class="modal-trigger-btn" onclick="openModal('extraModal')">
           <span>⚡ Features</span>
           <span class="trigger-badge">Active</span>
         </div>
       </div>
 
-      <div class="title-row">
-        <span>Source Code (HTML / CSS / JS)</span>
-      </div>
-      
-      <textarea id="sourceCode" oninput="runCode(false)" spellcheck="false" placeholder="Write or paste your custom app HTML/CSS/JS here..."></textarea>
+      <div class="title-row">Source Code (HTML / CSS / JS)</div>
+      <textarea id="sourceCode" oninput="runCode(false)" spellcheck="false" placeholder="Write or paste your app HTML/CSS/JS here..."></textarea>
 
-      <!-- Primary Action Buttons -->
-      <div class="primary-install-box">
-        <button class="install-big-btn" id="installPwaBtn" onclick="triggerAppInstall()">
-          <span>📲 Install on Phone</span>
-        </button>
-        <button class="apk-cloud-btn" onclick="saveAndExportBundle()">
-          <span>⚡ Save & Export Bundle</span>
-        </button>
-      </div>
+      <button class="install-big-btn" onclick="triggerAppInstall()">📲 Install on Phone</button>
 
       <div class="btn-row">
         <button class="action-btn" onclick="runCode(true)">👁 Render</button>
-        <button class="action-btn" onclick="saveMobileFile()">💾 Save HTML</button>
+        <button class="action-btn" onclick="saveMobileFile()">💾 Save App</button>
         <button class="action-btn" onclick="document.getElementById('bundleImporter').click()">📂 Import</button>
-        <button class="action-btn" onclick="openVaultModal()">📦 Vault</button>
       </div>
-      <input type="file" id="bundleImporter" accept=".json,.html" style="display: none;" onchange="importProject(event)">
-
+      <input type="file" id="bundleImporter" accept=".html,.json" style="display: none;" onchange="importProject(event)">
     </div>
 
-    <!-- Live AMOLED Preview Panel -->
     <div class="preview-panel" id="previewSection">
       <div class="preview-header">
         <span class="title-row">Live Mobile Screen</span>
@@ -597,115 +501,71 @@
     </div>
 
     <footer class="app-footer">welcome to shubh world</footer>
-
   </div>
 
-  <!-- POPUP 1: Build Specs -->
+  <!-- Build Specs Modal -->
   <div class="modal-backdrop" id="buildModal">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title">⚙ Android Build Specs</div>
-        <button class="close-icon" onclick="closeBuildModal()">&times;</button>
+        <button class="close-icon" onclick="closeModal('buildModal')">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="cfg-sub-title">Version Configuration</div>
-        <div class="cfg-grid">
-          <div class="cfg-item">
-            <span>Version Name</span>
-            <input type="text" id="cfgVerName" value="1.0.0" oninput="updateBuildBadge()">
-          </div>
-          <div class="cfg-item">
-            <span>Version Code</span>
-            <input type="number" id="cfgVerCode" value="1" min="1">
-          </div>
-          <div class="cfg-item">
-            <span>Orientation Lock</span>
-            <select id="cfgOrientation">
-              <option value="portrait">Portrait Only</option>
-              <option value="sensor">Auto Rotate</option>
-            </select>
-          </div>
-          <div class="cfg-item">
-            <span>Status Bar Color</span>
-            <input type="text" id="cfgStatusBarColor" value="#000000">
-          </div>
-        </div>
+        <label>Version Name <input type="text" value="1.0.0"></label>
+        <label>Status Bar Color <input type="text" value="#000000"></label>
       </div>
-      <div class="modal-footer">
-        <button class="btn-apply" onclick="closeBuildModal()">Done</button>
-      </div>
+      <div class="modal-footer"><button class="btn-apply" onclick="closeModal('buildModal')">Done</button></div>
     </div>
   </div>
 
-  <!-- POPUP 2: Permissions -->
+  <!-- Permissions Modal -->
   <div class="modal-backdrop" id="permModal">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title">🛡 Android Permissions</div>
-        <button class="close-icon" onclick="closePermModal()">&times;</button>
+        <button class="close-icon" onclick="closeModal('permModal')">&times;</button>
       </div>
-      <div class="modal-body">
-        <div class="perm-grid-compact" id="permGrid">
-          <label class="p-chip"><input type="checkbox" checked data-perm="android.permission.INTERNET" onchange="updatePermBadge()"> INTERNET</label>
-          <label class="p-chip"><input type="checkbox" data-perm="android.permission.ACCESS_NETWORK_STATE" onchange="updatePermBadge()"> NETWORK_STATE</label>
-          <label class="p-chip"><input type="checkbox" data-perm="android.permission.CAMERA" onchange="updatePermBadge()"> CAMERA</label>
-          <label class="p-chip"><input type="checkbox" data-perm="android.permission.RECORD_AUDIO" onchange="updatePermBadge()"> AUDIO</label>
-          <label class="p-chip"><input type="checkbox" data-perm="android.permission.VIBRATE" onchange="updatePermBadge()"> VIBRATE</label>
-          <label class="p-chip"><input type="checkbox" data-perm="android.permission.READ_EXTERNAL_STORAGE" onchange="updatePermBadge()"> STORAGE</label>
-        </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:8px;">
+        <label><input type="checkbox" checked> INTERNET</label>
+        <label><input type="checkbox"> CAMERA</label>
+        <label><input type="checkbox"> STORAGE</label>
       </div>
-      <div class="modal-footer">
-        <button class="btn-apply" onclick="closePermModal()">Done</button>
-      </div>
+      <div class="modal-footer"><button class="btn-apply" onclick="closeModal('permModal')">Done</button></div>
     </div>
   </div>
 
-  <!-- POPUP 3: Extra Features -->
+  <!-- Extra Features Modal -->
   <div class="modal-backdrop" id="extraModal">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title">⚡ Extra Features</div>
-        <button class="close-icon" onclick="closeExtraFeaturesModal()">&times;</button>
+        <button class="close-icon" onclick="closeModal('extraModal')">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="cfg-sub-title">Engine & Acceleration</div>
-        <div class="cfg-grid">
-          <div class="cfg-item">
-            <span>Hardware Acceleration</span>
-            <select id="cfgHwAccel"><option value="true">Enabled (60 FPS)</option></select>
-          </div>
-          <div class="cfg-item">
-            <span>Touch Feedback</span>
-            <select id="cfgTouchLock"><option value="locked">Native Mobile Feel</option></select>
-          </div>
-        </div>
+        <label>Hardware Acceleration: <b>Enabled (60 FPS)</b></label>
+        <label>Rendering Engine: <b>Chromium WebCore</b></label>
       </div>
-      <div class="modal-footer">
-        <button class="btn-apply" onclick="closeExtraFeaturesModal()">Done</button>
-      </div>
+      <div class="modal-footer"><button class="btn-apply" onclick="closeModal('extraModal')">Done</button></div>
     </div>
   </div>
 
-  <!-- POPUP 4: Vault -->
+  <!-- Vault Modal -->
   <div class="modal-backdrop" id="vaultModal">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title">📦 Saved Projects Vault</div>
-        <button class="close-icon" onclick="closeVaultModal()">&times;</button>
+        <button class="close-icon" onclick="closeModal('vaultModal')">&times;</button>
       </div>
-      <div class="modal-body" id="vaultListContainer">
-        <div style="color:#666; font-size:12px; text-align:center; padding:20px;">Use 'Save & Export Bundle' to save your work here.</div>
+      <div class="modal-body">
+        <div style="color:#666; font-size:12px; text-align:center; padding:20px;">Use 'Save App' to store apps in local memory.</div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-apply" onclick="closeVaultModal()">Close</button>
-      </div>
+      <div class="modal-footer"><button class="btn-apply" onclick="closeModal('vaultModal')">Close</button></div>
     </div>
   </div>
 
   <div id="toast">Ready</div>
 
   <script>
-    let iconBase64 = null;
     let installPrompt = null;
 
     function showToast(msg) {
@@ -715,7 +575,6 @@
       setTimeout(() => t.classList.remove('show'), 2200);
     }
 
-    // Force purge cache and sync latest GitHub code
     function forceAppRefresh() {
       if ('caches' in window) {
         caches.keys().then(names => {
@@ -723,9 +582,7 @@
         });
       }
       showToast('Cache cleared! Syncing...');
-      setTimeout(() => {
-        window.location.reload(true);
-      }, 400);
+      setTimeout(() => { window.location.reload(true); }, 400);
     }
 
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -738,7 +595,7 @@
         installPrompt.prompt();
         installPrompt.userChoice.then(() => { installPrompt = null; });
       } else {
-        showToast('Browser ke 3-dots (⋮) par jakar "Add to Home screen" select karein!');
+        showToast('Browser menu (⋮) kholkar "Add to Home screen" select karein!');
       }
     }
 
@@ -746,59 +603,24 @@
       const name = document.getElementById('appName').value.trim();
       const sanitized = name.toLowerCase().replace(/[^a-z0-9]/g, '');
       document.getElementById('pkgName').value = 'com.dhawan.' + (sanitized || 'app');
-      updateDynamicManifest();
     }
 
-    function updateDynamicManifest() {
-      const appName = document.getElementById('appName').value.trim() || "Dhawan Studio Pro";
-      const iconsArr = iconBase64 ? [{ src: iconBase64, sizes: "192x192", type: "image/png" }] : [];
-      
-      const manifestObj = {
-        name: appName,
-        short_name: appName.replace(/\s+/g, '').substring(0, 12),
-        start_url: ".",
-        display: "standalone",
-        background_color: "#000000",
-        theme_color: "#000000",
-        icons: iconsArr
-      };
-
-      const stringified = JSON.stringify(manifestObj);
-      const blob = new Blob([stringified], { type: 'application/manifest+json' });
-      document.getElementById('dynamicManifest').setAttribute('href', URL.createObjectURL(blob));
-    }
-
-    function attachDoubleTapProtection(id) {
+    function attachDoubleTap(id) {
       const el = document.getElementById(id);
       let last = 0;
-      el.addEventListener('touchend', (e) => {
+      el.addEventListener('touchend', () => {
         let now = Date.now();
-        if (now - last < 350) { el.removeAttribute('readonly'); el.focus(); showToast('Unlocked for editing'); }
+        if (now - last < 350) { el.removeAttribute('readonly'); el.focus(); showToast('Unlocked'); }
         last = now;
       });
-      el.addEventListener('dblclick', () => { el.removeAttribute('readonly'); el.focus(); showToast('Unlocked for editing'); });
+      el.addEventListener('dblclick', () => { el.removeAttribute('readonly'); el.focus(); showToast('Unlocked'); });
       el.addEventListener('blur', () => { el.setAttribute('readonly', 'true'); });
     }
 
-    function openBuildModal() { document.getElementById('buildModal').classList.add('active'); }
-    function closeBuildModal() { document.getElementById('buildModal').classList.remove('active'); }
-    function openPermModal() { document.getElementById('permModal').classList.add('active'); }
-    function closePermModal() { document.getElementById('permModal').classList.remove('active'); }
-    function openExtraFeaturesModal() { document.getElementById('extraModal').classList.add('active'); }
-    function closeExtraFeaturesModal() { document.getElementById('extraModal').classList.remove('active'); }
-    function openVaultModal() { document.getElementById('vaultModal').classList.add('active'); }
-    function closeVaultModal() { document.getElementById('vaultModal').classList.remove('active'); }
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function openVaultModal() { openModal('vaultModal'); }
 
-    function updateBuildBadge() {
-      document.getElementById('buildBadge').innerText = 'v' + document.getElementById('cfgVerName').value;
-    }
-
-    function updatePermBadge() {
-      const c = document.querySelectorAll('#permGrid input:checked').length;
-      document.getElementById('permBadge').innerText = c + ' Active';
-    }
-
-    // Auto-compress heavy images (JPG/PNG) so upload never fails on mobile
     function loadIcon(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -809,58 +631,33 @@
         img.onload = function() {
           const canvas = document.createElement('canvas');
           const maxDim = 256;
-          let width = img.width;
-          let height = img.height;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > maxDim) { h *= maxDim / w; w = maxDim; } }
+          else { if (h > maxDim) { w *= maxDim / h; h = maxDim; } }
 
-          if (width > height) {
-            if (width > maxDim) { height *= maxDim / width; width = maxDim; }
-          } else {
-            if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
+          canvas.width = w; canvas.height = h;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
+          ctx.drawImage(img, 0, 0, w, h);
 
-          iconBase64 = canvas.toDataURL('image/jpeg', 0.85);
-          document.getElementById('iconDisplay').innerHTML = `<img src="${iconBase64}">`;
-          updateDynamicManifest();
-          showToast('Icon Set Successfully!');
+          const compressed = canvas.toDataURL('image/jpeg', 0.85);
+          localStorage.setItem('dhawan_app_icon', compressed);
+          applyLoadedIcon(compressed);
+          showToast('Custom Icon Saved & Applied!');
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
 
+    function applyLoadedIcon(src) {
+      document.getElementById('iconDisplay').innerHTML = `<img src="${src}">`;
+    }
+
     function runCode(scroll) {
       const raw = document.getElementById('sourceCode').value;
       const iframe = document.getElementById('phoneScreen');
       
-      const pitchBlackEmpty = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body {
-              margin: 0;
-              background-color: #000000 !important;
-              color: #222222;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              font-family: -apple-system, system-ui, sans-serif;
-              font-size: 11px;
-              letter-spacing: 2px;
-              text-transform: uppercase;
-              overflow: hidden;
-            }
-          </style>
-        </head>
-        <body>Awaiting Input</body>
-        </html>
-      `;
+      const pitchBlackEmpty = `<!DOCTYPE html><html><body style="margin:0;background:#000;color:#222;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:11px;letter-spacing:2px;">AWAITING INPUT</body></html>`;
 
       iframe.srcdoc = raw.trim() ? raw : pitchBlackEmpty;
       if (scroll) {
@@ -868,47 +665,21 @@
       }
     }
 
-    function saveAndExportBundle() {
-      const bundle = {
-        name: document.getElementById('appName').value,
-        package: document.getElementById('pkgName').value,
-        version: document.getElementById('cfgVerName').value,
-        code: document.getElementById('sourceCode').value,
-        icon: iconBase64
-      };
-
-      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = bundle.name.replace(/\s+/g, '_') + '.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(a.href);
-
-      showToast('Project Bundle Exported!');
-    }
-
     function saveMobileFile() {
       const code = document.getElementById('sourceCode').value;
       const name = document.getElementById('appName').value.trim() || 'MyApp';
 
-      if (!code.trim()) {
-        showToast('Pehle source code box me kuch likhiye!');
-        return;
-      }
+      if (!code.trim()) { showToast('Pehle source code box me code likhein!'); return; }
 
-      const filename = name.replace(/\s+/g, '_').toLowerCase() + '.html';
       const blob = new Blob([code], { type: 'text/html' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = filename;
+      a.download = name.replace(/\s+/g, '_').toLowerCase() + '.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
-
-      showToast('HTML file saved successfully!');
+      showToast('App saved!');
     }
 
     function importProject(event) {
@@ -916,33 +687,17 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (e) => {
-        try {
-          const content = e.target.result;
-          if (file.name.endsWith('.json')) {
-            const d = JSON.parse(content);
-            if (d.name) document.getElementById('appName').value = d.name;
-            if (d.package) document.getElementById('pkgName').value = d.package;
-            if (d.code) document.getElementById('sourceCode').value = d.code;
-            if (d.version) document.getElementById('cfgVerName').value = d.version;
-            if (d.icon) {
-              iconBase64 = d.icon;
-              document.getElementById('iconDisplay').innerHTML = `<img src="${iconBase64}">`;
-            }
-          } else {
-            document.getElementById('sourceCode').value = content;
-          }
-          runCode(false);
-          showToast('Loaded Successfully!');
-        } catch(err) {
-          showToast('Import failed');
-        }
+        document.getElementById('sourceCode').value = e.target.result;
+        runCode(false);
+        showToast('Imported Successfully!');
       };
       reader.readAsText(file);
     }
 
     window.onload = function() {
-      attachDoubleTapProtection('pkgName');
-      updateDynamicManifest();
+      attachDoubleTap('pkgName');
+      const savedIcon = localStorage.getItem('dhawan_app_icon');
+      if (savedIcon) applyLoadedIcon(savedIcon);
       runCode(false);
     };
   </script>
