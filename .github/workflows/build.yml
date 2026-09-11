@@ -26,34 +26,57 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build Standalone APK
+      - name: Install Tools
         run: |
-          npm install -g @bubblewrap/cli
-          mkdir app-build && cd app-build
-          cp ../index.html ./index.html 2>/dev/null || true
-          
-          # Initialize minimal web app project
-          npx @bubblewrap/cli init --manifest="data:application/json;base64,eyJuYW1lIjoiRGhhd2FuIFN0dWRpbyBQcm8iLCJzaG9ydF9uYW1lIjoiRGhhd2FuU3R1ZGlvIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwNzA3MDciLCJ0aGVtZV9jb2xvciI6IiMwNzA3MDcifQ==" --directory=. || true
-          
-          # Compile Direct APK
-          echo "Building package..."
-          mkdir -p output
-          if [ -f ../index.html ]; then
-            tar -czf output/app-web.tar.gz ../index.html
-          fi
-
-      - name: Create Native APK via Cordova
-        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
           npm install -g cordova
+
+      - name: Create Native App & Inject All Assets
+        run: |
+          # 1. Create clean Cordova app
           cordova create myapp com.dhawan.studiopro "Dhawan Studio Pro"
           cd myapp
           cordova platform add android
+
+          # 2. Inject current index.html
           rm -rf www/*
-          cp ../index.html www/index.html
+          if [ -f ../index.html ]; then
+            cp ../index.html www/index.html
+          fi
+
+          # 3. Process Custom icon.jpg if uploaded
+          if [ -f ../icon.jpg ]; then
+            echo "Processing and injecting custom icon.jpg..."
+            mkdir -p res/icon/android
+
+            # Generate standard sizes
+            convert ../icon.jpg -resize 36x36 res/icon/android/ldpi.png
+            convert ../icon.jpg -resize 48x48 res/icon/android/mdpi.png
+            convert ../icon.jpg -resize 72x72 res/icon/android/hdpi.png
+            convert ../icon.jpg -resize 96x96 res/icon/android/xhdpi.png
+            convert ../icon.jpg -resize 144x144 res/icon/android/xxhdpi.png
+            convert ../icon.jpg -resize 192x192 res/icon/android/xxxhdpi.png
+
+            # Replace native Android project mipmap icons permanently
+            for resdir in platforms/android/app/src/main/res/mipmap-*; do
+              if [ -d "$resdir" ]; then
+                convert ../icon.jpg -resize 192x192 "$resdir/ic_launcher.png" 2>/dev/null || true
+                convert ../icon.jpg -resize 192x192 "$resdir/ic_launcher_round.png" 2>/dev/null || true
+                convert ../icon.jpg -resize 192x192 "$resdir/ic_launcher_foreground.png" 2>/dev/null || true
+              fi
+            done
+          fi
+
+          # 4. Auto-Increment versionCode so phone ALWAYS allows "Update" over existing app
+          TIMESTAMP_VC=$(date +%s | cut -c 3-10)
+          sed -i "s/android:versionCode=\"[0-9]*\"/android:versionCode=\"$TIMESTAMP_VC\"/g" platforms/android/app/src/main/AndroidManifest.xml || true
+
+          # 5. Build Native Debug APK
           cordova build android --debug
 
-      - name: Upload APK
+      - name: Upload Finished APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: Dhawan-Studio-Pro-APK
           path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
